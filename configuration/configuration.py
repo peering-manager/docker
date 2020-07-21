@@ -91,7 +91,7 @@ EMAIL = {
     "USERNAME": os.environ.get("EMAIL_USERNAME", ""),
     "PASSWORD": os.environ.get("EMAIL_PASSWORD", read_secret("email_password")),
     "TIMEOUT": int(os.environ.get("EMAIL_TIMEOUT", 10)),  # seconds
-    "FROM_EMAIL": os.environ.get("EMAIL_FROM", ""),
+    "FROM_ADDRESS": os.environ.get("EMAIL_FROM_ADDRESS", ""),
     "USE_SSL": os.environ.get("EMAIL_USE_SSL", "False").lower() == "true",
     "USE_TLS": os.environ.get("EMAIL_USE_TLS", "False").lower() == "true",
     "SSL_CERTFILE": os.environ.get("EMAIL_SSL_CERTFILE", ""),
@@ -107,7 +107,10 @@ PEERINGDB_PASSWORD = os.environ.get(
 NAPALM_USERNAME = os.environ.get("NAPALM_USERNAME", "")
 NAPALM_PASSWORD = os.environ.get("NAPALM_PASSWORD", read_secret("napalm_password"))
 NAPALM_TIMEOUT = int(os.environ.get("NAPALM_TIMEOUT", 30))
-NAPALM_ARGS = {}
+NAPALM_ARGS = dict([
+  (var[len('NAPALM_ARG_'):].lower(), os.environ.get(var))
+  for var in os.environ.keys() if var.startswith('NAPALM_ARG_')
+])
 PAGINATE_COUNT = int(os.environ.get("PAGINATE_COUNT", 50))
 BGPQ3_PATH = os.environ.get("BGPQ3_PATH", "bgpq3")
 BGPQ3_HOST = os.environ.get("BGPQ3_HOST", "rr.ntt.net")
