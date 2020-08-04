@@ -3,10 +3,11 @@ RUN apt-get update -y \
     && apt-get install -y python3-dev libldap2-dev libsasl2-dev build-essential bgpq3
 RUN adduser --system --group --home /opt/peering-manager --no-create-home --shell /bin/bash peering-manager  
 WORKDIR /opt/peering-manager
-COPY --chown=peering-manager:peering-manager peering-manager /opt/peering-manager
+COPY --chown=peering-manager:peering-manager peering-manager/requirements* /opt/peering-manager/
 RUN pip3 install --upgrade pip \
     && pip3 install --no-cache-dir -r requirements_dev.txt \
     && pip3 install --no-cache-dir gunicorn
+COPY --chown=peering-manager:peering-manager peering-manager /opt/peering-manager
 COPY --chown=peering-manager:peering-manager configuration/configuration.py /opt/peering-manager/peering_manager
 COPY configuration/gunicorn_config.py /etc/peering-manager/config/
 COPY startup_scripts/ /opt/peering-manager/startup_scripts/
