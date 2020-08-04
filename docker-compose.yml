@@ -1,0 +1,60 @@
+version: '3.4'
+services:
+  peering-manager:
+    image: peering-manager:latest
+    env_file: env/peering-manager.env
+    depends_on:
+      - postgres
+      - redis
+      - peering-manager-worker
+    volumes:
+      - peering-manager-static-files:/opt/peering-manager/static:z
+      - peering-manager-nginx-config:/etc/peering-manager/nginx:z
+        #    entrypoint:
+        #      - /bin/sleep
+        #    command:
+        #      - "100000"
+  peering-manager-worker:
+    image: peering-manager:latest
+    entrypoint:
+      - python3
+      - /opt/peering-manager/manage.py
+    command:
+      - rqworker
+    env_file: env/peering-manager.env
+    depends_on:
+      - postgres
+      - redis
+  postgres:
+    image: postgres:11-alpine
+    env_file: env/postgres.env
+    volumes:
+      - peering-manager-data:/var/lib/postgresql/data
+  redis:
+    image: redis:5-alpine
+    env_file: env/redis.env
+    volumes: 
+      - peering-manager-redis:/data
+    command:
+      - sh
+      - -c # this is to evaluate the $REDIS_PASSWORD from the env
+      - redis-server --requirepass $$REDIS_PASSWORD ## $$ because of docker-compose
+  nginx:
+    image: nginx:1.17-alpine
+    command: nginx -c /etc/peering-manager/nginx/nginx.conf
+    depends_on:
+      - peering-manager
+    ports: 
+      - 8080:8080
+    volumes:
+      - peering-manager-static-files:/opt/peering-manager/static:ro
+      - peering-manager-nginx-config:/etc/peering-manager/nginx:ro
+volumes:
+  peering-manager-static-files:
+    driver: local
+  peering-manager-nginx-config:
+    driver: local
+  peering-manager-data:
+    driver: local
+  peering-manager-redis:
+    driver: local
