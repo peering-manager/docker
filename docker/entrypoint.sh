@@ -1,10 +1,10 @@
 #!/bin/bash
-# Runs on every start of the Netbox Docker container
+# Runs on every start of the Peering Manager Docker container
 
 # Stop when an error occures
 set -e
 
-# Allows Netbox to be run as non-root users
+# Allows Peering Manager to be run as non-root users
 umask 002
 
 # Try to connect to the DB
@@ -48,11 +48,10 @@ else
 
   ./manage.py shell --interface python << END
 from django.contrib.auth.models import User
-from users.models import Token,UserPreferences
+from users.models import Token
 if not User.objects.filter(username='${SUPERUSER_NAME}'):
-    u=User.objects.create_superuser('${SUPERUSER_NAME}', '${SUPERUSER_EMAIL}', '${SUPERUSER_PASSWORD}')
+    u = User.objects.create_superuser('${SUPERUSER_NAME}', '${SUPERUSER_EMAIL}', '${SUPERUSER_PASSWORD}')
     Token.objects.create(user=u, key='${SUPERUSER_API_TOKEN}')
-    UserPreferences(user=u).save()
 END
 
   echo "💡 Superuser Username: ${SUPERUSER_NAME}, E-Mail: ${SUPERUSER_EMAIL}"
