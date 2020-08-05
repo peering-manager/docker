@@ -1,19 +1,56 @@
-FROM python:3
+FROM python:3-slim as builder
+
+# OS dependencies
 RUN apt-get update -y \
-    && apt-get install -y python3-dev libldap2-dev libsasl2-dev build-essential bgpq3
-RUN adduser --system --group --home /opt/peering-manager --no-create-home --shell /bin/bash peering-manager  
-WORKDIR /opt/peering-manager
-COPY --chown=peering-manager:peering-manager peering-manager/requirements* /opt/peering-manager/
-RUN pip3 install --upgrade pip \
-    && pip3 install --no-cache-dir -r requirements_dev.txt \
-    && pip3 install --no-cache-dir gunicorn
-COPY --chown=peering-manager:peering-manager peering-manager /opt/peering-manager
-COPY --chown=peering-manager:peering-manager configuration/configuration.py /opt/peering-manager/peering_manager
+    && apt-get install -y \
+       build-essential \
+       python3-dev \
+       libldap2-dev \
+       libsasl2-dev \
+       libssl-dev \
+       bgpq3
+
+ARG PEERING_MANAGER_PATH
+WORKDIR /peering-manager
+
+COPY ${PEERING_MANAGER_PATH}/requirements.txt /peering-manager
+RUN mkdir /install \
+    && pip3 install --upgrade pip \
+    && pip3 install \
+       --prefix="/install" --no-warn-script-location --no-cache-dir -r \
+       /peering-manager/requirements.txt \
+    && pip3 install \
+       --prefix="/install" --no-warn-script-location --no-cache-dir \
+       gunicorn \
+       django-auth-ldap \
+       django-radius
+
+##############
+# Main stage #
+##############
+
+FROM python:3-slim as main
+
+WORKDIR /opt
+
+COPY --from=builder /install /usr/local
+
+ARG PEERING_MANAGER_PATH
+COPY ${PEERING_MANAGER_PATH} /opt/peering-manager
+
+COPY configuration/configuration.py /opt/peering-manager/peering_manager
 COPY configuration/gunicorn_config.py /etc/peering-manager/config/
 COPY startup_scripts/ /opt/peering-manager/startup_scripts/
 COPY docker/nginx.conf /etc/peering-manager/nginx/nginx.conf
 COPY docker/entrypoint.sh /opt/peering-manager/
-RUN mkdir static && chown peering-manager:peering-manager static
-USER peering-manager:peering-manager
+
+WORKDIR /opt/peering-manager
+
+# Must set permissions for '/opt/peering-manager/static' directory
+# to g+w so that `./manage.py collectstatic` can be executed during
+# container startup.
+RUN mkdir static && chmod -R g+w static
+
 ENTRYPOINT [ "/opt/peering-manager/entrypoint.sh" ]
+
 CMD ["gunicorn", "-c", "/etc/peering-manager/config/gunicorn_config.py", "peering_manager.wsgi"]
