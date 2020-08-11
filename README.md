@@ -21,6 +21,9 @@ Official Docker images of Peering Manager are available on
 
 ### Building Images
 
+To build your own images you'll need the following binary: `bash`, `curl`,
+`git` and `jq` (in addition to Docker and standard UNIX utils).
+
 `./build.sh` can be used to rebuild Docker images. See `./build.sh --help` for
 more information. `build-latest.sh` will automatically retrieve the last
 available version of Peering Manager and build its image.
