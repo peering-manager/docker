@@ -7,8 +7,7 @@ RUN apt-get update -y \
        python3-dev \
        libldap2-dev \
        libsasl2-dev \
-       libssl-dev \
-       bgpq3
+       libssl-dev
 
 ARG PEERING_MANAGER_PATH
 WORKDIR /peering-manager
@@ -30,6 +29,11 @@ RUN mkdir /install \
 ##############
 
 FROM python:3-slim as main
+
+RUN apt-get -y update \
+    && apt-get -y install bgpq3 \
+    && apt-get clean \
+    && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 WORKDIR /opt
 
