@@ -40,7 +40,7 @@ services:
     command: nginx -c /etc/peering-manager/nginx/nginx.conf
     depends_on:
       - peering-manager
-    ports: 
+    ports:
       - 8080:8080
     volumes:
       - peering-manager-static-files:/opt/peering-manager/static:ro
