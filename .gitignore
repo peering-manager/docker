@@ -1,6 +1,6 @@
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
-peering-manager/
+.peering-manager/
 *.py[cod]
 *$py.class

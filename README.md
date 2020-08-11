@@ -14,6 +14,18 @@ To check the version installed on your system run `docker --version` and
 
 ## Getting Started
 
+### Built Images
+
+Official Docker images of Peering Manager are available on
+[Docker Hub](https://hub.docker.com/r/peeringmanager/peering-manager)
+
+### Building Images
+
+`./build.sh` can be used to rebuild Docker images. See `./build.sh --help` for
+more information. `build-latest.sh` will automatically retrieve the last
+available version of Peering Manager and build its image.
+
+
 ## About
 
 This work is based on the great
