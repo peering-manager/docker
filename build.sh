@@ -52,7 +52,7 @@ if [ "${1}x" == "x" ] || [ "${1}" == "--help" ] || [ "${1}" == "-h" ]; then
   echo "              Default: 'python:3.7-alpine'"
   echo "  DOCKER_TARGET A specific target to build."
   echo "              It's currently not possible to pass multiple targets."
-  echo "              Default: main ldap"
+  echo "              Default: main"
   echo "  HTTP_PROXY  The proxy to use for http requests."
   echo "              Example: http://proxy.domain.tld:3128"
   echo "              Default: undefined"
@@ -197,7 +197,7 @@ esac
 ###
 # Determine targets to build
 ###
-DEFAULT_DOCKER_TARGETS=("main" "ldap")
+DEFAULT_DOCKER_TARGETS=("main")
 DOCKER_TARGETS=( "${DOCKER_TARGET:-"${DEFAULT_DOCKER_TARGETS[@]}"}")
 echo "🏭 Building the following targets:" "${DOCKER_TARGETS[@]}"
 
