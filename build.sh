@@ -71,7 +71,7 @@ DOCKER_ORG="${DOCKER_ORG-peeringmanager}"
 DOCKER_REPO="${DOCKER_REPO-peering-manager}"
 case "${PEERING_MANAGER_BRANCH}" in
   master)
-    TAG="${TAG-latest}";;
+    TAG="${TAG-master}";;
   *)
     TAG="${TAG-$PEERING_MANAGER_BRANCH}";;
 esac
