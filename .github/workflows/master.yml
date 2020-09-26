@@ -10,8 +10,8 @@ on:
 jobs:
   build:
     env:
-     - DOCKER_ORG: miltonngan
-     - DOCKER_REPO: docker-dummy
+      DOCKER_ORG: miltonngan
+      DOCKER_REPO: docker-dummy
     strategy:
       matrix:
         build_cmd:
