@@ -16,9 +16,7 @@ jobs:
       matrix:
         build_cmd:
         - ./build-latest.sh
-        - PRERELEASE=true ./build-latest.sh
-        - ./build-next.sh
-        - ./build.sh develop
+        - ./build.sh master
       fail-fast: false
     runs-on: ubuntu-latest
     name: Builds new Netbox Docker Images
