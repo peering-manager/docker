@@ -157,7 +157,7 @@ fi
 # Determining the value for DOCKER_FROM
 ###
 if [ -z "$DOCKER_FROM" ]; then
-  DOCKER_FROM="python:3.7-alpine"
+  DOCKER_FROM="python:3-slim"
 fi
 
 ###
