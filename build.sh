@@ -27,8 +27,7 @@ if [ "${1}x" == "x" ] || [ "${1}" == "--help" ] || [ "${1}" == "-h" ]; then
   echo "              Default: undefined"
   echo "  TAG         The version part of the docker tag."
   echo "              Default:"
-  echo "                When <branch>=master:  latest"
-  echo "                When <branch>=develop: snapshot"
+  echo "                When <branch>=master:  snapshot"
   echo "                Else:                  same as <branch>"
   echo "  DOCKER_REGISTRY The Docker repository's registry (i.e. '\${DOCKER_REGISTRY}/\${DOCKER_ORG}/\${DOCKER_REPO}'')"
   echo "              Used for tagging the image."
@@ -71,22 +70,22 @@ if [ "${1}x" == "x" ] || [ "${1}" == "--help" ] || [ "${1}" == "-h" ]; then
   echo "Examples:"
   echo "  ${0} master"
   echo "              This will fetch the latest 'master' branch, build a Docker Image and tag it"
-  echo "              'respawner/peering-mananger:latest'."
+  echo "              'respawner/peering-manager:latest'."
   echo "  ${0} develop"
   echo "              This will fetch the latest 'develop' branch, build a Docker Image and tag it"
-  echo "              'respawner/peering-mananger:snapshot'."
+  echo "              'respawner/peering-manager:snapshot'."
   echo "  ${0} v2.6.6"
   echo "              This will fetch the 'v2.6.6' tag, build a Docker Image and tag it"
-  echo "              'respawner/peering-mananger:v2.6.6' and 'respawner/peering-manager:v2.6'."
+  echo "              'respawner/peering-manager:v2.6.6' and 'respawner/peering-manager:v2.6'."
   echo "  ${0} develop-2.7"
   echo "              This will fetch the 'develop-2.7' branch, build a Docker Image and tag it"
   echo "              'respawner/peering-manager:develop-2.7'."
-  echo "  SRC_ORG=cimnine ${0} feature-x"
-  echo "              This will fetch the 'feature-x' branch from https://github.com/cimnine/peering-manager.git,"
+  echo "  SRC_ORG=respawner ${0} feature-x"
+  echo "              This will fetch the 'feature-x' branch from https://github.com/respawner/peering-manager.git,"
   echo "              build a Docker Image and tag it 'respawner/peering-manager:feature-x'."
-  echo "  SRC_ORG=cimnine DOCKER_ORG=cimnine ${0} feature-x"
-  echo "              This will fetch the 'feature-x' branch from https://github.com/cimnine/peering-manager.git,"
-  echo "              build a Docker Image and tag it 'cimnine/peering-manager:feature-x'."
+  echo "  SRC_ORG=respawner DOCKER_ORG=respawner ${0} feature-x"
+  echo "              This will fetch the 'feature-x' branch from https://github.com/respawner/peering-manager.git,"
+  echo "              build a Docker Image and tag it 'respawner/peering-manager:feature-x'."
 
   if [ "${1}x" == "x" ]; then
     exit 1
@@ -183,12 +182,10 @@ fi
 # Variables for tagging the docker image
 ###
 DOCKER_REGISTRY="${DOCKER_REGISTRY-docker.io}"
-DOCKER_ORG="${DOCKER_ORG-respawner}"
+DOCKER_ORG="${DOCKER_ORG-peeringmanager}"
 DOCKER_REPO="${DOCKER_REPO-peering-manager}"
 case "${PEERING_MANAGER_BRANCH}" in
   master)
-    TAG="${TAG-latest}";;
-  develop)
     TAG="${TAG-snapshot}";;
   *)
     TAG="${TAG-$PEERING_MANAGER_BRANCH}";;

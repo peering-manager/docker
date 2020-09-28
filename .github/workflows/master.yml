@@ -9,9 +9,6 @@ on:
 
 jobs:
   build:
-    env:
-      DOCKER_ORG: miltonngan
-      DOCKER_REPO: docker-dummy
     strategy:
       matrix:
         build_cmd:
@@ -19,7 +16,7 @@ jobs:
         - ./build.sh master
       fail-fast: false
     runs-on: ubuntu-latest
-    name: Builds new Netbox Docker Images
+    name: Builds new Peering Manager Docker Images
     steps:
     - id: git-checkout
       name: Checkout
