@@ -4,7 +4,9 @@
 echo "▶️  $0 $*"
 
 # Querying GitHub to get the latest version
-GITHUB_REPO="peering-manager/peering-manager"
+SRC_ORG="${SRC_ORG-peering-manager}"
+SRC_REPO="${SRC_REPO-peering-manager}"
+GITHUB_REPO="${SRC_ORG}/${SRC_REPO}"
 URL_RELEASES="https://api.github.com/repos/${GITHUB_REPO}/releases"
 
 # Composing the JQ command to extract the most recent version number
