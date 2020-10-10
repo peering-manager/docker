@@ -9,7 +9,8 @@ RUN apt-get update -y \
        libsasl2-dev \
        libssl-dev \
        libxml2-dev \
-       libxslt1-dev
+       libxslt1-dev \
+       zlib1g-dev
 
 ARG PEERING_MANAGER_PATH
 WORKDIR /peering-manager
