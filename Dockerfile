@@ -7,7 +7,9 @@ RUN apt-get update -y \
        python3-dev \
        libldap2-dev \
        libsasl2-dev \
-       libssl-dev
+       libssl-dev \
+       libxml2-dev \
+       libxslt1-dev
 
 ARG PEERING_MANAGER_PATH
 WORKDIR /peering-manager
