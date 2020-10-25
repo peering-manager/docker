@@ -25,7 +25,9 @@ RUN mkdir /install \
        --prefix="/install" --no-warn-script-location --no-cache-dir \
        gunicorn \
        django-auth-ldap \
-       django-radius
+       django-radius \
+       django-debug_toolbar
+
 
 ##############
 # Main stage #
