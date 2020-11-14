@@ -1,7 +1,7 @@
 version: '3.4'
 services:
   peering-manager:
-    image: peering-manager:latest
+    image: peeringmanager/peering-manager:latest
     env_file: env/peering-manager.env
     depends_on:
       - postgres
@@ -11,7 +11,7 @@ services:
       - peering-manager-static-files:/opt/peering-manager/static:z
       - peering-manager-nginx-config:/etc/peering-manager/nginx:z
   peering-manager-worker:
-    image: peering-manager:latest
+    image: peeringmanager/peering-manager:latest
     entrypoint:
       - python3
       - /opt/peering-manager/manage.py
