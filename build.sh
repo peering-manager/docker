@@ -48,7 +48,7 @@ if [ "${1}x" == "x" ] || [ "${1}" == "--help" ] || [ "${1}" == "-h" ]; then
   echo "  DOCKERFILE  The name of Dockerfile to use."
   echo "              Default: Dockerfile"
   echo "  DOCKER_FROM The base image to use."
-  echo "              Default: 'python:3.7-alpine'"
+  echo "              Default: 'python:3-slim'"
   echo "  DOCKER_TARGET A specific target to build."
   echo "              It's currently not possible to pass multiple targets."
   echo "              Default: main"
