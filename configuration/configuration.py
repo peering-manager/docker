@@ -104,6 +104,7 @@ PEERINGDB_USERNAME = os.environ.get("PEERINGDB_USERNAME", "")
 PEERINGDB_PASSWORD = os.environ.get(
     "PEERINGDB_PASSWORD", read_secret("peeringdb_password")
 )
+PEERINGDB_API_KEY = os.environ.get("PEERINGDB_API_KEY", "")
 NAPALM_USERNAME = os.environ.get("NAPALM_USERNAME", "")
 NAPALM_PASSWORD = os.environ.get("NAPALM_PASSWORD", read_secret("napalm_password"))
 NAPALM_TIMEOUT = int(os.environ.get("NAPALM_TIMEOUT", 30))
