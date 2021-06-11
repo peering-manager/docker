@@ -1,9 +1,8 @@
 import os
-import re
-import socket
 
-# For reference see http://netbox.readthedocs.io/en/latest/configuration/mandatory-settings/
-# Based on https://github.com/netbox-community/netbox/blob/develop/netbox/netbox/configuration.example.py
+# For reference see:
+# * https://peering-manager.readthedocs.io/en/stable/configuration/required-settings/
+# * https://peering-manager.readthedocs.io/en/stable/configuration/optional-settings/
 
 # Read secret from file
 def read_secret(secret_name):
@@ -44,7 +43,9 @@ DATABASE = {
     ),  # PostgreSQL password
     "HOST": os.environ.get("DB_HOST", "localhost"),  # Database server
     "PORT": os.environ.get("DB_PORT", ""),  # Database port (leave blank for default)
-    "OPTIONS": {"sslmode": os.environ.get("DB_SSLMODE", "prefer"),},
+    "OPTIONS": {
+        "sslmode": os.environ.get("DB_SSLMODE", "prefer"),
+    },
     "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "300")),
 }
 
@@ -108,10 +109,13 @@ PEERINGDB_API_KEY = os.environ.get("PEERINGDB_API_KEY", "")
 NAPALM_USERNAME = os.environ.get("NAPALM_USERNAME", "")
 NAPALM_PASSWORD = os.environ.get("NAPALM_PASSWORD", read_secret("napalm_password"))
 NAPALM_TIMEOUT = int(os.environ.get("NAPALM_TIMEOUT", 30))
-NAPALM_ARGS = dict([
-  (var[len('NAPALM_ARG_'):].lower(), os.environ.get(var))
-  for var in os.environ.keys() if var.startswith('NAPALM_ARG_')
-])
+NAPALM_ARGS = dict(
+    [
+        (var[len("NAPALM_ARG_") :].lower(), os.environ.get(var))
+        for var in os.environ.keys()
+        if var.startswith("NAPALM_ARG_")
+    ]
+)
 PAGINATE_COUNT = int(os.environ.get("PAGINATE_COUNT", 50))
 BGPQ3_PATH = os.environ.get("BGPQ3_PATH", "bgpq3")
 BGPQ3_HOST = os.environ.get("BGPQ3_HOST", "rr.ntt.net")
