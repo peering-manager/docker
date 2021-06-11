@@ -1,9 +1,9 @@
-name: master
+name: main
 
 on:
   push:
     branches:
-      - master
+      - main
   schedule:
     - cron: '45 5 * * *'
 
@@ -13,7 +13,7 @@ jobs:
       matrix:
         build_cmd:
         - ./build-latest.sh
-        - ./build.sh master
+        - ./build.sh main
       fail-fast: false
     runs-on: ubuntu-latest
     name: Builds new Peering Manager Docker Images
