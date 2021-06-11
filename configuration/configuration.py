@@ -123,7 +123,7 @@ PEERINGDB_API_KEY = os.environ.get(
 )
 NAPALM_USERNAME = os.environ.get("NAPALM_USERNAME", "")
 NAPALM_PASSWORD = os.environ.get("NAPALM_PASSWORD", read_secret("napalm_password"))
-NAPALM_TIMEOUT = int(os.environ.get("NAPALM_TIMEOUT", 30))
+NAPALM_TIMEOUT = int(os.environ.get("NAPALM_TIMEOUT", 10))
 NAPALM_ARGS = dict(
     [
         (var[len("NAPALM_ARG_") :].lower(), os.environ.get(var))
