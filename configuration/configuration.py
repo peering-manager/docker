@@ -1,9 +1,8 @@
 import os
-import re
-import socket
 
-# For reference see http://netbox.readthedocs.io/en/latest/configuration/mandatory-settings/
-# Based on https://github.com/netbox-community/netbox/blob/develop/netbox/netbox/configuration.example.py
+# For reference see:
+# * https://peering-manager.readthedocs.io/en/stable/configuration/required-settings/
+# * https://peering-manager.readthedocs.io/en/stable/configuration/optional-settings/
 
 # Read secret from file
 def read_secret(secret_name):
@@ -57,7 +56,9 @@ DATABASE = {
     ),  # PostgreSQL password
     "HOST": os.environ.get("DB_HOST", "localhost"),  # Database server
     "PORT": os.environ.get("DB_PORT", ""),  # Database port (leave blank for default)
-    "OPTIONS": {"sslmode": os.environ.get("DB_SSLMODE", "prefer"),},
+    "OPTIONS": {
+        "sslmode": os.environ.get("DB_SSLMODE", "prefer"),
+    },
     "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "300")),
 }
 
