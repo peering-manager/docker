@@ -27,7 +27,7 @@ if [ "${1}x" == "x" ] || [ "${1}" == "--help" ] || [ "${1}" == "-h" ]; then
   echo "              Default: undefined"
   echo "  TAG         The version part of the docker tag."
   echo "              Default:"
-  echo "                When <branch>=master:  snapshot"
+  echo "                When <branch>=main:  snapshot"
   echo "                Else:                  same as <branch>"
   echo "  DOCKER_REGISTRY The Docker repository's registry (i.e. '\${DOCKER_REGISTRY}/\${DOCKER_ORG}/\${DOCKER_REPO}'')"
   echo "              Used for tagging the image."
@@ -48,7 +48,7 @@ if [ "${1}x" == "x" ] || [ "${1}" == "--help" ] || [ "${1}" == "-h" ]; then
   echo "  DOCKERFILE  The name of Dockerfile to use."
   echo "              Default: Dockerfile"
   echo "  DOCKER_FROM The base image to use."
-  echo "              Default: 'python:3.7-alpine'"
+  echo "              Default: 'python:3-slim'"
   echo "  DOCKER_TARGET A specific target to build."
   echo "              It's currently not possible to pass multiple targets."
   echo "              Default: main"
@@ -68,8 +68,8 @@ if [ "${1}x" == "x" ] || [ "${1}" == "--help" ] || [ "${1}" == "-h" ]; then
   echo "              Default: undefined"
   echo ""
   echo "Examples:"
-  echo "  ${0} master"
-  echo "              This will fetch the latest 'master' branch, build a Docker Image and tag it"
+  echo "  ${0} main"
+  echo "              This will fetch the latest 'main' branch, build a Docker Image and tag it"
   echo "              'peering-manager/peering-manager:latest'."
   echo "  ${0} develop"
   echo "              This will fetch the latest 'develop' branch, build a Docker Image and tag it"
@@ -185,7 +185,7 @@ DOCKER_REGISTRY="${DOCKER_REGISTRY-docker.io}"
 DOCKER_ORG="${DOCKER_ORG-peeringmanager}"
 DOCKER_REPO="${DOCKER_REPO-peering-manager}"
 case "${PEERING_MANAGER_BRANCH}" in
-  master)
+  main)
     TAG="${TAG-snapshot}";;
   *)
     TAG="${TAG-$PEERING_MANAGER_BRANCH}";;
@@ -213,7 +213,7 @@ for DOCKER_TARGET in "${DOCKER_TARGETS[@]}"; do
     TARGET_DOCKER_TAG="${TARGET_DOCKER_TAG}-${DOCKER_TARGET}"
   fi
   if [ -n "${GH_ACTION}" ]; then
-    echo "::set-env name=FINAL_DOCKER_TAG::${TARGET_DOCKER_TAG}"
+    echo "FINAL_DOCKER_TAG=${TARGET_DOCKER_TAG}" >> $GITHUB_ENV
     echo "::set-output name=skipped::false"
   fi
 
