@@ -149,7 +149,7 @@ NETBOX_DEVICE_ROLES = os.environ.get(
 ).split(",")
 RELEASE_CHECK_URL = os.environ.get(
     "RELEASE_CHECK_URL",
-    "https://api.github.com/repos/respawner/peering-manager/releases",
+    "https://api.github.com/repos/peering-manager/peering-manager/releases",
 )
 RELEASE_CHECK_TIMEOUT = os.environ.get("RELEASE_CHECK_TIMEOUT", 86400)
 SOFTDELETE_ENABLED = os.environ.get("SOFTDELETE_ENABLED", "False").lower() == "true"
