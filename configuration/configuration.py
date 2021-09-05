@@ -15,6 +15,19 @@ def read_secret(secret_name):
             return f.readline().strip()
 
 
+def get_sys_tz():
+    try:
+        with open("/etc/timezone", "r") as f:
+            tz = f.readline()
+
+        # For some reasons, Django does not seem to be happy about this particular value
+        if "Etc/UTC" in tz:
+            raise Exception("Unsupported TZ")
+    except (IOError, Exception):
+        tz = "UTC"
+
+    return tz
+
 # This is a list of valid fully-qualified domain names (FQDNs) for this server.
 # The server will not permit write access to the server via any other
 # hostnames. The first FQDN in the list will be treated as the preferred name.
@@ -29,7 +42,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", read_secret("secret_key"))
 BASE_PATH = os.environ.get("BASE_PATH", "")
 
 # Time zone to use for date.
-TIME_ZONE = os.environ.get("TIME_ZONE", "UTC")
+TIME_ZONE = os.environ.get("TIME_ZONE", get_sys_tz())
 
 # Autonomous System number
 MY_ASN = int(os.environ.get("MY_ASN", 64512))
@@ -55,7 +68,7 @@ REDIS = {
         "HOST": os.environ.get("REDIS_HOST", "localhost"),
         "PORT": int(os.environ.get("REDIS_PORT", 6379)),
         "PASSWORD": os.environ.get("REDIS_PASSWORD", read_secret("redis_password")),
-        "CACHE_DATABASE": int(os.environ.get("REDIS_DATABASE", 0)),
+        "DATABASE": int(os.environ.get("REDIS_DATABASE", 0)),
         "DEFAULT_TIMEOUT": int(os.environ.get("REDIS_TIMEOUT", 300)),
         "SSL": os.environ.get("REDIS_SSL", "False").lower() == "true",
     },
@@ -71,7 +84,7 @@ REDIS = {
             "REDIS_CACHE_PASSWORD",
             os.environ.get("REDIS_PASSWORD", read_secret("redis_cache_password")),
         ),
-        "CACHE_DATABASE": int(os.environ.get("REDIS_CACHE_DATABASE", 1)),
+        "DATABASE": int(os.environ.get("REDIS_CACHE_DATABASE", 1)),
         "DEFAULT_TIMEOUT": int(
             os.environ.get("REDIS_CACHE_TIMEOUT", os.environ.get("REDIS_TIMEOUT", 300))
         ),
@@ -101,14 +114,17 @@ EMAIL = {
 
 CHANGELOG_RETENTION = int(os.environ.get("CHANGELOG_RETENTION", 90))
 LOGIN_REQUIRED = os.environ.get("LOGIN_REQUIRED", "False").lower() == "true"
+BANNER_LOGIN = os.environ.get("BANNER_LOGIN", "")
 PEERINGDB_USERNAME = os.environ.get("PEERINGDB_USERNAME", "")
 PEERINGDB_PASSWORD = os.environ.get(
     "PEERINGDB_PASSWORD", read_secret("peeringdb_password")
 )
-PEERINGDB_API_KEY = os.environ.get("PEERINGDB_API_KEY", "")
+PEERINGDB_API_KEY = os.environ.get(
+    "PEERINGDB_API_KEY", read_secret("peeringdb_api_key")
+)
 NAPALM_USERNAME = os.environ.get("NAPALM_USERNAME", "")
 NAPALM_PASSWORD = os.environ.get("NAPALM_PASSWORD", read_secret("napalm_password"))
-NAPALM_TIMEOUT = int(os.environ.get("NAPALM_TIMEOUT", 30))
+NAPALM_TIMEOUT = int(os.environ.get("NAPALM_TIMEOUT", 10))
 NAPALM_ARGS = dict(
     [
         (var[len("NAPALM_ARG_") :].lower(), os.environ.get(var))
@@ -121,7 +137,7 @@ BGPQ3_PATH = os.environ.get("BGPQ3_PATH", "bgpq3")
 BGPQ3_HOST = os.environ.get("BGPQ3_HOST", "rr.ntt.net")
 BGPQ3_SOURCES = os.environ.get(
     "BGPQ3_SOURCES",
-    "RIPE,APNIC,AFRINIC,ARIN,NTTCOM,ALTDB,BBOI,BELL,JPIRR,LEVEL3,RADB,RGNET,SAVVIS,TC",
+    "RIPE,APNIC,AFRINIC,ARIN,NTTCOM,ALTDB,BBOI,BELL,JPIRR,LEVEL3,RADB,RGNET,TC",
 )
 BGPQ3_ARGS = {
     "ipv6": os.environ.get("BGPQ3_ARGS_IPV6", "-r 16 -R 48").split(" "),
@@ -134,6 +150,14 @@ NETBOX_DEVICE_ROLES = os.environ.get(
 ).split(",")
 RELEASE_CHECK_URL = os.environ.get(
     "RELEASE_CHECK_URL",
-    "https://api.github.com/repos/respawner/peering-manager/releases",
+    "https://api.github.com/repos/peering-manager/peering-manager/releases",
 )
 RELEASE_CHECK_TIMEOUT = os.environ.get("RELEASE_CHECK_TIMEOUT", 86400)
+SOFTDELETE_ENABLED = os.environ.get("SOFTDELETE_ENABLED", "False").lower() == "true"
+SOFTDELETE_RETENTION = int(os.environ.get("SOFTDELETE_RETENTION", CHANGELOG_RETENTION))
+DATE_FORMAT = os.environ.get("DATE_FORMAT", "jS F, Y")
+DATETIME_FORMAT = os.environ.get("DATETIME_FORMAT", "jS F, Y G:i")
+SHORT_DATE_FORMAT = os.environ.get("SHORT_DATE_FORMAT", "Y-m-d")
+SHORT_DATETIME_FORMAT = os.environ.get("SHORT_DATETIME_FORMAT", "Y-m-d H:i")
+SHORT_TIME_FORMAT = os.environ.get("SHORT_TIME_FORMAT", "H:i:s")
+TIME_FORMAT = os.environ.get("TIME_FORMAT", "G:i")
