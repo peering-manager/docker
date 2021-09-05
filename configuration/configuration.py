@@ -68,7 +68,7 @@ REDIS = {
         "HOST": os.environ.get("REDIS_HOST", "localhost"),
         "PORT": int(os.environ.get("REDIS_PORT", 6379)),
         "PASSWORD": os.environ.get("REDIS_PASSWORD", read_secret("redis_password")),
-        "CACHE_DATABASE": int(os.environ.get("REDIS_DATABASE", 0)),
+        "DATABASE": int(os.environ.get("REDIS_DATABASE", 0)),
         "DEFAULT_TIMEOUT": int(os.environ.get("REDIS_TIMEOUT", 300)),
         "SSL": os.environ.get("REDIS_SSL", "False").lower() == "true",
     },
@@ -84,7 +84,7 @@ REDIS = {
             "REDIS_CACHE_PASSWORD",
             os.environ.get("REDIS_PASSWORD", read_secret("redis_cache_password")),
         ),
-        "CACHE_DATABASE": int(os.environ.get("REDIS_CACHE_DATABASE", 1)),
+        "DATABASE": int(os.environ.get("REDIS_CACHE_DATABASE", 1)),
         "DEFAULT_TIMEOUT": int(
             os.environ.get("REDIS_CACHE_TIMEOUT", os.environ.get("REDIS_TIMEOUT", 300))
         ),
