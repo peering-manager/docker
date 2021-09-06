@@ -34,7 +34,7 @@ RUN mkdir /install \
 FROM python:3-slim as main
 
 RUN apt-get -y update \
-    && apt-get -y install bgpq3 libldap-2.4.2\
+    && apt-get -y install bgpq3 libldap-2.4.2 \
     && apt-get clean \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
