@@ -6,6 +6,7 @@ RUN apt-get update -y \
        build-essential \
        python3-dev \
        libldap2-dev \
+       libpq-dev \
        libsasl2-dev \
        libssl-dev \
        libxml2-dev \
