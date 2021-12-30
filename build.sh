@@ -1,5 +1,5 @@
 #!/bin/bash
-# Clones the Netbox repository with git from Github and builds the Dockerfile
+# Clones the Peering Manager repository from Github and builds the Dockerfile
 
 echo "▶️ $0 $*"
 
@@ -27,8 +27,8 @@ if [ "${1}x" == "x" ] || [ "${1}" == "--help" ] || [ "${1}" == "-h" ]; then
   echo "              Default: undefined"
   echo "  TAG         The version part of the docker tag."
   echo "              Default:"
-  echo "                When <branch>=main:  snapshot"
-  echo "                Else:                  same as <branch>"
+  echo "                When <branch>=main: snapshot"
+  echo "                Else:               same as <branch>"
   echo "  DOCKER_REGISTRY The Docker repository's registry (i.e. '\${DOCKER_REGISTRY}/\${DOCKER_ORG}/\${DOCKER_REPO}'')"
   echo "              Used for tagging the image."
   echo "              Default: docker.io"
@@ -43,15 +43,13 @@ if [ "${1}x" == "x" ] || [ "${1}" == "--help" ] || [ "${1}" == "-h" ]; then
   echo "              Default: \${DOCKER_REGISTRY}/\${DOCKER_ORG}/\${DOCKER_REPO}:\${TAG}"
   echo "  DOCKER_SHORT_TAG The name of the short tag which is applied to the"
   echo "              image. This is used to tag all patch releases to their"
-  echo "              containing version e.g. v2.5.1 -> v2.5"
+  echo "              containing version e.g. v1.5.2 -> v1.5"
   echo "              Default: \${DOCKER_REGISTRY}/\${DOCKER_ORG}/\${DOCKER_REPO}:<MAJOR>.<MINOR>"
   echo "  DOCKERFILE  The name of Dockerfile to use."
   echo "              Default: Dockerfile"
-  echo "  DOCKER_FROM The base image to use."
-  echo "              Default: 'python:3-slim'"
   echo "  DOCKER_TARGET A specific target to build."
   echo "              It's currently not possible to pass multiple targets."
-  echo "              Default: main"
+  echo "              Default: main ldap"
   echo "  HTTP_PROXY  The proxy to use for http requests."
   echo "              Example: http://proxy.domain.tld:3128"
   echo "              Default: undefined"
@@ -71,20 +69,14 @@ if [ "${1}x" == "x" ] || [ "${1}" == "--help" ] || [ "${1}" == "-h" ]; then
   echo "  ${0} main"
   echo "              This will fetch the latest 'main' branch, build a Docker Image and tag it"
   echo "              'peering-manager/peering-manager:latest'."
-  echo "  ${0} develop"
-  echo "              This will fetch the latest 'develop' branch, build a Docker Image and tag it"
-  echo "              'peering-manager/peering-manager:snapshot'."
-  echo "  ${0} v2.6.6"
-  echo "              This will fetch the 'v2.6.6' tag, build a Docker Image and tag it"
-  echo "              'peering-manager/peering-manager:v2.6.6' and 'peering-manager/peering-manager:v2.6'."
-  echo "  ${0} develop-2.7"
-  echo "              This will fetch the 'develop-2.7' branch, build a Docker Image and tag it"
-  echo "              'peering-manager/peering-manager:develop-2.7'."
+  echo "  ${0} v1.5.2"
+  echo "              This will fetch the 'v1.5.2' tag, build a Docker Image and tag it"
+  echo "              'peering-manager/peering-manager:v1.5.2' and 'peering-manager/peering-manager:v1.5'."
   echo "  SRC_ORG=peering-manager ${0} feature-x"
-  echo "              This will fetch the 'feature-x' branch from https://github.com/peering-manager/peering-manager.git,"
+  echo "              This will fetch the 'feature-x' branch from https://github.com/peering-manager/peering-manager.git",
   echo "              build a Docker Image and tag it 'peering-manager/peering-manager:feature-x'."
   echo "  SRC_ORG=peering-manager DOCKER_ORG=peering-manager ${0} feature-x"
-  echo "              This will fetch the 'feature-x' branch from https://github.com/peering-manager/peering-manager.git,"
+  echo "              This will fetch the 'feature-x' branch from https://github.com/peering-manager/peering-manager.git",
   echo "              build a Docker Image and tag it 'peering-manager/peering-manager:feature-x'."
 
   if [ "${1}x" == "x" ]; then
@@ -93,6 +85,8 @@ if [ "${1}x" == "x" ] || [ "${1}" == "--help" ] || [ "${1}" == "-h" ]; then
     exit 0
   fi
 fi
+
+source ./build-functions/gh-functions.sh
 
 ###
 # Enabling dry-run mode
@@ -103,6 +97,8 @@ else
   echo "⚠️ DRY_RUN MODE ON ⚠️"
   DRY="echo"
 fi
+
+gh_echo "::group::⤵️ Fetching the Peering Manager source code"
 
 ###
 # Variables for fetching the source
@@ -117,6 +113,12 @@ PEERING_MANAGER_PATH="${PEERING_MANAGER_PATH-.peering-manager}"
 # Fetching the source
 ###
 if [ "${2}" != "--push-only" ] && [ -z "${SKIP_GIT}" ] ; then
+  REMOTE_EXISTS=$(git ls-remote --heads --tags "${URL}" "${PEERING_MANAGER_BRANCH}" | wc -l)
+  if [ "${REMOTE_EXISTS}" == "0" ]; then
+    echo "❌ Remote branch '${PEERING_MANAGER_BRANCH}' not found in '${URL}'; Nothing to do"
+    gh_echo "::set-output name=skipped::true"
+    exit 0
+  fi
   echo "🌐 Checking out '${PEERING_MANAGER_BRANCH}' of peering-manager from the url '${URL}' into '${PEERING_MANAGER_PATH}'"
   if [ ! -d "${PEERING_MANAGER_PATH}" ]; then
     $DRY git clone -q --depth 10 -b "${PEERING_MANAGER_BRANCH}" "${URL}" "${PEERING_MANAGER_PATH}"
@@ -137,6 +139,9 @@ if [ "${2}" != "--push-only" ] && [ -z "${SKIP_GIT}" ] ; then
   echo "✅ Checked out peering-manager"
 fi
 
+gh_echo "::endgroup::"
+gh_echo "::group::🧮 Calculating Values"
+
 ###
 # Determining the value for DOCKERFILE
 # and checking whether it exists
@@ -148,15 +153,8 @@ if [ ! -f "${DOCKERFILE}" ]; then
   if [ -z "${DEBUG}" ]; then
     exit 1
   else
-    echo "⚠️ Would exit here with code '1', but DEBUG is enabled."
+    echo "⚠️  Would exit here with code '1', but DEBUG is enabled."
   fi
-fi
-
-###
-# Determining the value for DOCKER_FROM
-###
-if [ -z "$DOCKER_FROM" ]; then
-  DOCKER_FROM="python:3-slim"
 fi
 
 ###
@@ -194,15 +192,18 @@ esac
 ###
 # Determine targets to build
 ###
-DEFAULT_DOCKER_TARGETS=("main")
+DEFAULT_DOCKER_TARGETS=("main" "ldap")
 DOCKER_TARGETS=( "${DOCKER_TARGET:-"${DEFAULT_DOCKER_TARGETS[@]}"}")
 echo "🏭 Building the following targets:" "${DOCKER_TARGETS[@]}"
+
+gh_echo "::endgroup::"
 
 ###
 # Build each target
 ###
 export DOCKER_BUILDKIT=${DOCKER_BUILDKIT-1}
 for DOCKER_TARGET in "${DOCKER_TARGETS[@]}"; do
+  gh_echo "::group::🏗 Building the target '${DOCKER_TARGET}'"
   echo "🏗 Building the target '${DOCKER_TARGET}'"
 
   ###
@@ -214,12 +215,12 @@ for DOCKER_TARGET in "${DOCKER_TARGETS[@]}"; do
   fi
   if [ -n "${GH_ACTION}" ]; then
     echo "FINAL_DOCKER_TAG=${TARGET_DOCKER_TAG}" >> $GITHUB_ENV
-    echo "::set-output name=skipped::false"
+    gh_echo "::set-output name=skipped::false"
   fi
 
   ###
   # composing the additional DOCKER_SHORT_TAG,
-  # i.e. "v2.6.1" becomes "v2.6",
+  # i.e. "v1.5.2" becomes "v1.5",
   # which is only relevant for version tags
   # Also let "latest" follow the highest version
   ###
@@ -327,9 +328,6 @@ for DOCKER_TARGET in "${DOCKER_TARGETS[@]}"; do
     # --build-arg
     DOCKER_BUILD_ARGS+=(   --build-arg "PEERING_MANAGER_PATH=${PEERING_MANAGER_PATH}" )
 
-    if [ -n "${DOCKER_FROM}" ]; then
-      DOCKER_BUILD_ARGS+=( --build-arg "FROM=${DOCKER_FROM}" )
-    fi
     if [ -n "${HTTP_PROXY}" ]; then
       DOCKER_BUILD_ARGS+=( --build-arg "http_proxy=${HTTP_PROXY}" )
       DOCKER_BUILD_ARGS+=( --build-arg "https_proxy=${HTTPS_PROXY}" )
@@ -366,4 +364,6 @@ for DOCKER_TARGET in "${DOCKER_TARGETS[@]}"; do
       push_image_to_registry "${TARGET_DOCKER_LATEST_TAG}"
     fi
   fi
+
+  gh_echo "::endgroup::"
 done
