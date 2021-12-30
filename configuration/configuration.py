@@ -45,9 +45,6 @@ BASE_PATH = os.environ.get("BASE_PATH", "")
 # Time zone to use for date.
 TIME_ZONE = os.environ.get("TIME_ZONE", get_sys_tz())
 
-# Autonomous System number
-MY_ASN = int(os.environ.get("MY_ASN", 64512))
-
 # PostgreSQL database configuration
 DATABASE = {
     "NAME": os.environ.get("DB_NAME", "peering_manager"),  # Database name
