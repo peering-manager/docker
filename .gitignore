@@ -38,7 +38,7 @@ Temporary Items
 configuration/*
 !configuration/configuration.py
 !configuration/extra.py
-configuration/ldap/*
+!configuration/ldap
 !configuration/ldap/extra.py
 !configuration/ldap/ldap_config.py
 !configuration/logging.py
