@@ -213,10 +213,9 @@ for DOCKER_TARGET in "${DOCKER_TARGETS[@]}"; do
   if [ "${DOCKER_TARGET}" != "main" ]; then
     TARGET_DOCKER_TAG="${TARGET_DOCKER_TAG}-${DOCKER_TARGET}"
   fi
-  if [ -n "${GH_ACTION}" ]; then
-    echo "FINAL_DOCKER_TAG=${TARGET_DOCKER_TAG}" >> $GITHUB_ENV
-    gh_echo "::set-output name=skipped::false"
-  fi
+
+  gh_env "FINAL_DOCKER_TAG=${TARGET_DOCKER_TAG}"
+  gh_echo "::set-output name=skipped::false"
 
   ###
   # composing the additional DOCKER_SHORT_TAG,
