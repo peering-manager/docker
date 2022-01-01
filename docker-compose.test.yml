@@ -12,6 +12,7 @@ services:
     user: "unit:root"
     volumes:
       - ./startup_scripts:/opt/peering-manager/startup_scripts:z,ro
+      - ./${INITIALIZERS_DIR-initializers}:/opt/peering-manager/initializers:z,ro
       - ./configuration:/etc/peering-manager/config:z,ro
   postgres:
     image: postgres:14-alpine

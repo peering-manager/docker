@@ -29,12 +29,50 @@ fi
 
 # The docker compose command to use
 doco="docker-compose --file docker-compose.test.yml --project-name peeringmanager_docker_test_${1}"
+INITIALIZERS_DIR=".initializers"
+
+test_setup() {
+  echo "🏗  Setup up test environment"
+  if [ -d "${INITIALIZERS_DIR}" ]; then
+    rm -rf "${INITIALIZERS_DIR}"
+  fi
+
+  mkdir "${INITIALIZERS_DIR}"
+  (
+    cd initializers
+    for script in *.yml; do
+      sed -E 's/^# //' "${script}" > "../${INITIALIZERS_DIR}/${script}"
+    done
+  )
+}
 
 test_peeringmanager_unit_tests() {
-  echo "⏱ Running NetBox Unit Tests"
+  echo "⏱  Running Peering Manager Unit Tests"
   $doco run --rm peering-manager /opt/peering-manager/venv/bin/python /opt/peering-manager/manage.py test
 }
 
+test_initializers() {
+  echo "🏭 Testing Initializers"
+  export INITIALIZERS_DIR
+  $doco run --rm peering-manager /opt/peering-manager/docker-entrypoint.sh ./manage.py check
+}
+
+test_cleanup() {
+  echo "💣 Cleaning Up"
+  $doco down -v
+
+  if [ -d "${INITIALIZERS_DIR}" ]; then
+    rm -rf "${INITIALIZERS_DIR}"
+  fi
+}
+
 echo "🐳 Start testing '${IMAGE}'"
+
+# Make sure the cleanup script is executed
+trap test_cleanup EXIT ERR
+test_setup
+
 test_peeringmanager_unit_tests
+test_initializers
+
 echo "🐳 Done testing '${IMAGE}'"

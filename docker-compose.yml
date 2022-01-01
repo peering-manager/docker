@@ -6,6 +6,11 @@ services:
     &peering-manager
     image: peeringmanager/peering-manager:${VERSION-v1.5}
     env_file: env/peering-manager.env
+    user: "unit:root"
+    volumes:
+      - ./startup_scripts:/opt/peering-manager/startup_scripts:z,ro
+      - ./initializers:/opt/peering-manager/initializers:z,ro
+      - ./configuration:/etc/peering-manager/config:z,ro
     depends_on:
       - postgres
       - redis

@@ -34,6 +34,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+.initializers
 configuration/*
 !configuration/configuration.py
 !configuration/extra.py

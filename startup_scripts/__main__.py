@@ -16,7 +16,7 @@ with scandir(dirname(abspath(__file__))) as it:
         if f.name.startswith("__") or not f.is_file():
             continue
 
-        print(f"▶️ Running the startup script {f.path}")
+        print(f"▶️  Running the startup script {f.path}")
         try:
             runpy.run_path(f.path)
         except SystemExit as e:

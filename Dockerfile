@@ -26,7 +26,7 @@ RUN apk add --no-cache \
 
 ARG PEERING_MANAGER_PATH
 COPY ${PEERING_MANAGER_PATH}/requirements.txt requirements-container.txt /
-RUN /opt/peering-manager/venv/bin/pip install -r /requirements.txt
+RUN /opt/peering-manager/venv/bin/pip install -r /requirements.txt -r /requirements-container.txt
 WORKDIR /peering-manager
 
 ##############
@@ -63,6 +63,7 @@ COPY docker/configuration.docker.py /opt/peering-manager/peering_manager/configu
 COPY docker/docker-entrypoint.sh /opt/peering-manager/docker-entrypoint.sh
 COPY docker/launch-peering-manager.sh /opt/peering-manager/launch-peering-manager.sh
 COPY startup_scripts/ /opt/peering-manager/startup_scripts/
+COPY initializers/ /opt/peering-manager/initializers/
 COPY configuration/ /etc/peering-manager/config/
 COPY docker/nginx-unit.json /etc/unit/
 

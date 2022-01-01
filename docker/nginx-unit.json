@@ -15,12 +15,12 @@
         },
         {
             "action": {
-                "pass": "applications/netbox"
+                "pass": "applications/peeringmanager"
             }
         }
     ],
     "applications": {
-        "netbox": {
+        "peeringmanager": {
             "type": "python 3",
             "path": "/opt/peering-manager/",
             "module": "peering_manager.wsgi",
