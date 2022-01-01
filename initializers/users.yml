@@ -9,3 +9,8 @@
 #   is_superuser: false
 #   is_staff: false
 #   email: ironman@avengers.com
+# srogers:
+#   first_name: Steve
+#   last_name: Rogers
+#   password: CaptainAmerica
+#   email: captain@avengers.com

@@ -11,12 +11,14 @@ if not users:
 
 for username, details in users.items():
     if not User.objects.filter(username=username):
+        api_token = details.pop("api_token", "")
         user = User.objects.create_user(
             username=username,
-            password=details.get("password") or User.objects.make_random_password(),
+            password=details.pop("password", "") or User.objects.make_random_password(),
+            **details,
         )
 
         print(f"👤 Created user '{username}'")
 
-        if details.get("api_token"):
-            Token.objects.create(user=user, key=details["api_token"])
+        if api_token:
+            Token.objects.create(user=user, key=api_token)
