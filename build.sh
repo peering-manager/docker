@@ -212,9 +212,9 @@ for DOCKER_TARGET in "${DOCKER_TARGETS[@]}"; do
   TARGET_DOCKER_TAG="${DOCKER_TAG-${DOCKER_REGISTRY}/${DOCKER_ORG}/${DOCKER_REPO}:${TAG}}"
   if [ "${DOCKER_TARGET}" != "main" ]; then
     TARGET_DOCKER_TAG="${TARGET_DOCKER_TAG}-${DOCKER_TARGET}"
+  else
+    gh_env "FINAL_DOCKER_TAG=${TARGET_DOCKER_TAG}"
   fi
-
-  gh_env "FINAL_DOCKER_TAG=${TARGET_DOCKER_TAG}"
   gh_echo "::set-output name=skipped::false"
 
   ###
