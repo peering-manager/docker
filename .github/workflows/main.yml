@@ -15,15 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build new images
     steps:
-      - id: git-checkout
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v2
-      - id: docker-build
-        name: Build the image with '${{ matrix.build_cmd }}'
+      - name: Build the image with '${{ matrix.build_cmd }}'
+        id: docker-build
         run: ${{ matrix.build_cmd }}
         env:
           GH_ACTION: enable
-      - id: docker-test
-        name: Test the image
+      - name: Test the image
         run: IMAGE="${FINAL_DOCKER_TAG}" ./test.sh
         if: steps.docker-build.outputs.skipped != 'true'
