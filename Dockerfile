@@ -22,11 +22,7 @@ RUN mkdir /install \
     && pip3 install \
        --prefix="/install" --no-warn-script-location --no-cache-dir -r \
        /peering-manager/requirements.txt \
-    && pip3 install \
-       --prefix="/install" --no-warn-script-location --no-cache-dir \
-       gunicorn \
-       'django-auth-ldap<4.0.0' \
-       django-radius
+       gunicorn django-auth-ldap django-radius
 
 ##############
 # Main stage #
