@@ -25,7 +25,7 @@ RUN mkdir /install \
     && pip3 install \
        --prefix="/install" --no-warn-script-location --no-cache-dir \
        gunicorn \
-       django-auth-ldap \
+       'django-auth-ldap<4.0.0' \
        django-radius
 
 ##############
