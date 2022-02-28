@@ -1,0 +1,60 @@
+---
+name: release
+
+on:
+  release:
+    types:
+      - published
+  schedule:
+    - cron: '45 5 * * *'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        build_cmd:
+          - ./build-latest.sh
+          - ./build.sh main
+      fail-fast: false
+    runs-on: ubuntu-latest
+    name: Build new images
+    env:
+      GH_ACTION: enable
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get version of Peering Manager Docker
+        run: |
+          echo "::set-output name=version::$(cat VERSION)"
+        shell: bash
+      - id: docker-build
+        name: Build the image with '${{ matrix.build_cmd }}'
+        run: ${{ matrix.build_cmd }}
+      - name: Test the image
+        run: IMAGE="${FINAL_DOCKER_TAG}" ./test.sh
+        if: steps.docker-build.outputs.skipped != 'true'
+      # docker.io
+      - name: Login to docker.io
+        uses: docker/login-action@v1
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        if: steps.docker-build.outputs.skipped != 'true'
+      - name: Push the image to docker.io
+        run: ${{ matrix.build_cmd }} --push-only
+        if: steps.docker-build.outputs.skipped != 'true'
+      # ghcr.io
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.docker-build.outputs.skipped != 'true'
+      - name: Push the image to ghcr.io
+        run: ${{ matrix.build_cmd }} --push
+        env:
+          DOCKER_REGISTRY: ghcr.io
+          DOCKER_ORG: peering-manager
+        if: steps.docker-build.outputs.skipped != 'true'

@@ -1,7 +1,13 @@
 #!/bin/bash
 # Builds the latest released version
 
-echo "▶️  $0 $*"
+echo "▶️ $0 $*"
+
+# Check for the jq library needed for parsing JSON
+if ! command -v jq; then
+  echo "⚠️  jq command missing from \$PATH!"
+  exit 1
+fi
 
 # Querying GitHub to get the latest version
 SRC_ORG="${SRC_ORG-peering-manager}"

@@ -28,6 +28,7 @@ def get_sys_tz():
 
     return tz
 
+
 # This is a list of valid fully-qualified domain names (FQDNs) for this server.
 # The server will not permit write access to the server via any other
 # hostnames. The first FQDN in the list will be treated as the preferred name.
@@ -43,9 +44,6 @@ BASE_PATH = os.environ.get("BASE_PATH", "")
 
 # Time zone to use for date.
 TIME_ZONE = os.environ.get("TIME_ZONE", get_sys_tz())
-
-# Autonomous System number
-MY_ASN = int(os.environ.get("MY_ASN", 64512))
 
 # PostgreSQL database configuration
 DATABASE = {
@@ -69,31 +67,25 @@ REDIS = {
         "PORT": int(os.environ.get("REDIS_PORT", 6379)),
         "PASSWORD": os.environ.get("REDIS_PASSWORD", read_secret("redis_password")),
         "DATABASE": int(os.environ.get("REDIS_DATABASE", 0)),
-        "DEFAULT_TIMEOUT": int(os.environ.get("REDIS_TIMEOUT", 300)),
         "SSL": os.environ.get("REDIS_SSL", "False").lower() == "true",
     },
     "caching": {
         "HOST": os.environ.get(
             "REDIS_CACHE_HOST", os.environ.get("REDIS_HOST", "localhost")
         ),
-        "PORT": os.environ.get(
-            "REDIS_CACHE_PORT",
-            os.environ.get("REDIS_PORT", 6379)
-        ),
+        "PORT": os.environ.get("REDIS_CACHE_PORT", os.environ.get("REDIS_PORT", 6379)),
         "PASSWORD": os.environ.get(
             "REDIS_CACHE_PASSWORD",
             os.environ.get("REDIS_PASSWORD", read_secret("redis_cache_password")),
         ),
         "DATABASE": int(os.environ.get("REDIS_CACHE_DATABASE", 1)),
-        "DEFAULT_TIMEOUT": int(
-            os.environ.get("REDIS_CACHE_TIMEOUT", os.environ.get("REDIS_TIMEOUT", 300))
-        ),
         "SSL": os.environ.get(
             "REDIS_CACHE_SSL", os.environ.get("REDIS_SSL", "False")
         ).lower()
         == "true",
     },
 }
+RQ_DEFAULT_TIMEOUT = int(os.environ.get("CACHE_TIMEOUT", 300))
 # Cache timeout in seconds. Set to 0 to disable caching.
 CACHE_TIMEOUT = int(os.environ.get("CACHE_TIMEOUT", 900))
 
@@ -161,3 +153,8 @@ SHORT_DATE_FORMAT = os.environ.get("SHORT_DATE_FORMAT", "Y-m-d")
 SHORT_DATETIME_FORMAT = os.environ.get("SHORT_DATETIME_FORMAT", "Y-m-d H:i")
 SHORT_TIME_FORMAT = os.environ.get("SHORT_TIME_FORMAT", "H:i:s")
 TIME_FORMAT = os.environ.get("TIME_FORMAT", "G:i")
+
+# Enable custom logging. Please see the Django documentation for detailed
+# guidance on configuring custom logs:
+# https://docs.djangoproject.com/en/stable/topics/logging/
+LOGGING = {}

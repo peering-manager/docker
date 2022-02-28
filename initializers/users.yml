@@ -1,0 +1,16 @@
+---
+# api_user:
+#   api_token: 0123456789abcdef0123456789abcdef
+# tstark:
+#   first_name: Tony
+#   last_name: Stark
+#   api_token: 0123456789ironman0123456789abcdef
+#   is_active: true
+#   is_superuser: false
+#   is_staff: false
+#   email: ironman@avengers.com
+# srogers:
+#   first_name: Steve
+#   last_name: Rogers
+#   password: CaptainAmerica
+#   email: captain@avengers.com

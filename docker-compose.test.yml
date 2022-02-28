@@ -1,0 +1,26 @@
+---
+version: "3.4"
+services:
+  peering-manager:
+    image: ${IMAGE-peeringmanager/peering-manager:latest}
+    depends_on:
+      - postgres
+      - redis
+    env_file: env/peering-manager.env
+    environment:
+      SKIP_STARTUP_SCRIPTS: ${SKIP_STARTUP_SCRIPTS-false}
+    user: "unit:root"
+    volumes:
+      - ./startup_scripts:/opt/peering-manager/startup_scripts:z,ro
+      - ./${INITIALIZERS_DIR-initializers}:/opt/peering-manager/initializers:z,ro
+      - ./configuration:/etc/peering-manager/config:z,ro
+  postgres:
+    image: postgres:14-alpine
+    env_file: env/postgres.env
+  redis:
+    image: redis:6-alpine
+    env_file: env/redis.env
+    command:
+      - sh
+      - -c # this is to evaluate the $REDIS_PASSWORD from the env
+      - redis-server --appendonly yes --requirepass $$REDIS_PASSWORD ## $$ because of docker-compose

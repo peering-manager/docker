@@ -1,0 +1,36 @@
+{
+    "listeners": {
+        "*:8080": {
+            "pass": "routes"
+        }
+    },
+    "routes": [
+        {
+            "match": {
+                "uri": "/static/*"
+            },
+            "action": {
+                "share": "/opt/peering-manager/"
+            }
+        },
+        {
+            "action": {
+                "pass": "applications/peeringmanager"
+            }
+        }
+    ],
+    "applications": {
+        "peeringmanager": {
+            "type": "python 3",
+            "path": "/opt/peering-manager/",
+            "module": "peering_manager.wsgi",
+            "home": "/opt/peering-manager/venv",
+            "processes": {
+                "max": 4,
+                "spare": 1,
+                "idle_timeout": 120
+            }
+        }
+    },
+    "access_log": "/dev/stdout"
+}
