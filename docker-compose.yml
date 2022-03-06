@@ -4,7 +4,7 @@ version: "3.4"
 services:
   peering-manager:
     &peering-manager
-    image: peeringmanager/peering-manager:${VERSION-v1.5}
+    image: peeringmanager/peering-manager:${VERSION-v1.6}
     env_file: env/peering-manager.env
     user: "unit:root"
     volumes:
