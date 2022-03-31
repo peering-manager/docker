@@ -15,8 +15,6 @@ services:
       - postgres
       - redis
       - peering-manager-worker
-    ports:
-      - 8080
   peering-manager-worker:
     <<: *peering-manager
     depends_on:

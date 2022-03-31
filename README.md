@@ -28,6 +28,11 @@ To build your own images you'll need the following binary: `bash`, `curl`,
 more information. `build-latest.sh` will automatically retrieve the last
 available version of Peering Manager and build its image.
 
+### Running With Docker Compose
+
+To run the Peering Manager application stack with Docker Compose, copy the
+`docker-compose.override.yml.example` file into `docker-compose.override.yml`
+and override definitions from this file.
 
 ## About
 
