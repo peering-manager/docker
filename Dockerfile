@@ -86,17 +86,6 @@ LABEL ORIGINAL_TAG="" \
     PEERING_MANAGER_GIT_BRANCH="" \
     PEERING_MANAGER_GIT_REF="" \
     PEERING_MANAGER_GIT_URL="" \
-    # See http://label-schema.org/rc1/#build-time-labels
-    org.label-schema.schema-version="1.0" \
-    org.label-schema.build-date="" \
-    org.label-schema.name="Peering Manager Docker" \
-    org.label-schema.description="A container based distribution of Peering Manager, the free and open BGP management solution." \
-    org.label-schema.vendor="The Peering Manager contributors." \
-    org.label-schema.url="https://github.com/peering-manager/docker" \
-    org.label-schema.usage="https://github.com/peering-manager/docker" \
-    org.label-schema.vcs-url="https://github.com/peering-manager/docker.git" \
-    org.label-schema.vcs-ref="" \
-    org.label-schema.version="snapshot" \
     # See https://github.com/opencontainers/image-spec/blob/master/annotations.md#pre-defined-annotation-keys
     org.opencontainers.image.created="" \
     org.opencontainers.image.title="Peering Manager Docker" \

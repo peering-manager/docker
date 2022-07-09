@@ -162,7 +162,7 @@ fi
 ###
 BUILD_DATE="$(date -u '+%Y-%m-%dT%H:%M+00:00')"
 
-if [ -d ".git" ]; then
+if [ -d ".git" ] && [ -z "${SKIP_GIT}" ]; then
   GIT_REF="$(git rev-parse HEAD)"
 fi
 
@@ -170,7 +170,7 @@ fi
 PROJECT_VERSION="${PROJECT_VERSION-$(sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' VERSION)}"
 
 # Get the Git information from the peering-manager directory
-if [ -d "${PEERING_MANAGER_PATH}/.git" ]; then
+if [ -d "${PEERING_MANAGER_PATH}/.git" ] && [ -z "${SKIP_GIT}" ]; then
   PEERING_MANAGER_GIT_REF=$(cd "${PEERING_MANAGER_PATH}"; git rev-parse HEAD)
   PEERING_MANAGER_GIT_BRANCH=$(cd "${PEERING_MANAGER_PATH}"; git rev-parse --abbrev-ref HEAD)
   PEERING_MANAGER_GIT_URL=$(cd "${PEERING_MANAGER_PATH}"; git remote get-url origin)
@@ -243,9 +243,9 @@ for DOCKER_TARGET in "${DOCKER_TARGETS[@]}"; do
     ###
     # Checking if the build is necessary,
     # meaning build only if one of those values changed:
-    # - Python base image digest (Label: PYTHON_BASE_DIGEST)
-    # - peering-manager git ref (Label: PEERING_MANAGER_GIT_REF)
-    # - peering-manager-docker git ref (Label: org.label-schema.vcs-ref)
+    # - base image digest
+    # - peering-manager git ref (Label: peering-manager.git-ref)
+    # - peering-manager-docker git ref (Label: org.opencontainers.image.revision)
     ###
     # Load information from registry (only for docker.io)
     SHOULD_BUILD="false"
@@ -263,8 +263,8 @@ for DOCKER_TARGET in "${DOCKER_TARGETS[@]}"; do
       fi
       PYTHON_LAST_LAYER=$(get_image_last_layer "${DOCKER_FROM_SPLIT[0]}" "${DOCKER_FROM_SPLIT[1]}")
       mapfile -t IMAGES_LAYERS_OLD < <(get_image_layers "${DOCKER_ORG}"/"${DOCKER_REPO}" "${TAG}")
-      PEERING_MANAGER_GIT_REF_OLD=$(get_image_label PEERING_MANAGER_GIT_REF "${DOCKER_ORG}"/"${DOCKER_REPO}" "${TAG}")
-      GIT_REF_OLD=$(get_image_label org.label-schema.vcs-ref "${DOCKER_ORG}"/"${DOCKER_REPO}" "${TAG}")
+      PEERING_MANAGER_GIT_REF_OLD=$(get_image_label peering-manager.git-ref "${DOCKER_ORG}"/"${DOCKER_REPO}" "${TAG}")
+      GIT_REF_OLD=$(get_image_label org.opencontainers.image.revision "${DOCKER_ORG}"/"${DOCKER_REPO}" "${TAG}")
 
       if ! printf '%s\n' "${IMAGES_LAYERS_OLD[@]}" | grep -q -P "^${PYTHON_LAST_LAYER}\$"; then
         SHOULD_BUILD="true"
@@ -299,16 +299,11 @@ for DOCKER_TARGET in "${DOCKER_TARGETS[@]}"; do
     # --label
     DOCKER_BUILD_ARGS+=(
       --label "ORIGINAL_TAG=${TARGET_DOCKER_TAG}"
-
-      --label "org.label-schema.build-date=${BUILD_DATE}"
       --label "org.opencontainers.image.created=${BUILD_DATE}"
-
-      --label "org.label-schema.version=${PROJECT_VERSION}"
       --label "org.opencontainers.image.version=${PROJECT_VERSION}"
     )
     if [ -d ".git" ]; then
       DOCKER_BUILD_ARGS+=(
-        --label "org.label-schema.vcs-ref=${GIT_REF}"
         --label "org.opencontainers.image.revision=${GIT_REF}"
       )
     fi
@@ -344,7 +339,7 @@ for DOCKER_TARGET in "${DOCKER_TARGETS[@]}"; do
       $DRY docker build "${DOCKER_BUILD_ARGS[@]}" .
       echo "✅ Finished building the Docker images '${TARGET_DOCKER_TAG}'"
       echo "🔎 Inspecting labels on '${TARGET_DOCKER_TAG}'"
-      $DRY docker inspect "${TARGET_DOCKER_TAG}" --format "{{json .Config.Labels}}"
+      $DRY docker inspect "${TARGET_DOCKER_TAG}" --format "{{json .Config.Labels}}" | jq
     else
       echo "Build skipped because sources didn't change"
       echo "::set-output name=skipped::true"
