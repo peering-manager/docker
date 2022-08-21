@@ -1,6 +1,6 @@
 import sys
 
-from utils.enums import Color
+from utils.enums import Colour
 from utils.models import Tag
 
 from startup_script_utils import load_yaml
@@ -13,7 +13,7 @@ for params in tags:
     if "color" in params:
         color = params.pop("color")
 
-        for color_tpl in Color.choices:
+        for color_tpl in Colour:
             if color in color_tpl:
                 params["color"] = color_tpl[0]
 
