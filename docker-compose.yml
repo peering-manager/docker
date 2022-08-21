@@ -4,7 +4,7 @@ version: "3.4"
 services:
   peering-manager:
     &peering-manager
-    image: peeringmanager/peering-manager:${VERSION-v1.6}
+    image: peeringmanager/peering-manager:${VERSION-v1.7}
     env_file: env/peering-manager.env
     user: "unit:root"
     volumes:
@@ -14,8 +14,8 @@ services:
     depends_on:
       - postgres
       - redis
-      - peering-manager-worker
-  peering-manager-worker:
+      - rqworker
+  rqworker:
     <<: *peering-manager
     depends_on:
       - postgres
@@ -24,6 +24,20 @@ services:
       - /opt/peering-manager/venv/bin/python
       - /opt/peering-manager/manage.py
       - rqworker
+  housekeeping:
+    <<: *peering-manager
+    depends_on:
+      - postgres
+      - redis
+    command:
+      - /opt/peering-manager/housekeeping.sh
+  peeringdb-sync:
+    <<: *peering-manager
+    depends_on:
+      - postgres
+      - redis
+    command:
+      - /opt/peering-manager/peeringdb.sh
   postgres:
     image: postgres:14-alpine
     env_file: env/postgres.env

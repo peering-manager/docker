@@ -105,6 +105,7 @@ EMAIL = {
 }
 
 CHANGELOG_RETENTION = int(os.environ.get("CHANGELOG_RETENTION", 90))
+JOBRESULT_RETENTION = int(os.environ.get("JOBRESULT_RETENTION", 90))
 LOGIN_REQUIRED = os.environ.get("LOGIN_REQUIRED", "False").lower() == "true"
 BANNER_LOGIN = os.environ.get("BANNER_LOGIN", "")
 PEERINGDB_USERNAME = os.environ.get("PEERINGDB_USERNAME", "")
@@ -144,7 +145,6 @@ RELEASE_CHECK_URL = os.environ.get(
     "RELEASE_CHECK_URL",
     "https://api.github.com/repos/peering-manager/peering-manager/releases",
 )
-RELEASE_CHECK_TIMEOUT = os.environ.get("RELEASE_CHECK_TIMEOUT", 86400)
 SOFTDELETE_ENABLED = os.environ.get("SOFTDELETE_ENABLED", "False").lower() == "true"
 SOFTDELETE_RETENTION = int(os.environ.get("SOFTDELETE_RETENTION", CHANGELOG_RETENTION))
 DATE_FORMAT = os.environ.get("DATE_FORMAT", "jS F, Y")
