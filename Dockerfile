@@ -29,6 +29,23 @@ COPY ${PEERING_MANAGER_PATH}/requirements.txt requirements-container.txt /
 RUN /opt/peering-manager/venv/bin/pip install -r /requirements.txt -r /requirements-container.txt
 WORKDIR /peering-manager
 
+FROM alpine:3.14 as bgpq-builder
+
+RUN mkdir app && \
+    apk add --no-cache build-base autoconf automake gcc git libtool linux-headers musl-dev
+
+WORKDIR /bgp3
+
+RUN mkdir /bgpq3 && \
+    git clone https://github.com/snar/bgpq3 . && git checkout v0.1.36.1 && \
+    ./configure && make install 
+
+WORKDIR /bgp4
+
+RUN mkdir /bgpq4 && \
+    git clone https://github.com/bgp/bgpq4.git . && git checkout 1.5 && \
+    ./bootstrap && ./configure && make install 
+
 ##############
 # Main stage #
 ##############
@@ -55,6 +72,8 @@ RUN apk add --no-cache \
 WORKDIR /opt
 
 COPY --from=builder /opt/peering-manager/venv /opt/peering-manager/venv
+COPY --from=bgpq-builder /usr/local/bin/bgpq3 /usr/local/bin/bgpq3
+COPY --from=bgpq-builder /usr/local/bin/bgpq4 /usr/local/bin/bgpq4
 
 ARG PEERING_MANAGER_PATH
 COPY ${PEERING_MANAGER_PATH} /opt/peering-manager
