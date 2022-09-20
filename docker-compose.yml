@@ -26,18 +26,24 @@ services:
       - rqworker
   housekeeping:
     <<: *peering-manager
+    environment:
+      - COMMAND_INTERVAL=86400
     depends_on:
       - postgres
       - redis
     command:
-      - /opt/peering-manager/housekeeping.sh
+      - /opt/peering-manager/run-command.sh
+      - housekeeping
   peeringdb-sync:
     <<: *peering-manager
+    environment:
+      - COMMAND_INTERVAL=86400
     depends_on:
       - postgres
       - redis
     command:
-      - /opt/peering-manager/peeringdb.sh
+      - /opt/peering-manager/run-command.sh
+      - peeringdb_sync
   postgres:
     image: postgres:14-alpine
     env_file: env/postgres.env

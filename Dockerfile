@@ -43,7 +43,7 @@ RUN mkdir /bgpq3 && \
 WORKDIR /bgp4
 
 RUN mkdir /bgpq4 && \
-    git clone https://github.com/bgp/bgpq4.git . && git checkout 1.5 && \
+    git clone https://github.com/bgp/bgpq4.git . && git checkout 1.6 && \
     ./bootstrap && ./configure && make install 
 
 ##############
@@ -80,8 +80,7 @@ COPY ${PEERING_MANAGER_PATH} /opt/peering-manager
 
 COPY docker/configuration.docker.py /opt/peering-manager/peering_manager/configuration.py
 COPY docker/docker-entrypoint.sh /opt/peering-manager/docker-entrypoint.sh
-COPY docker/housekeeping.sh /opt/peering-manager/housekeeping.sh
-COPY docker/peeringdb.sh /opt/peering-manager/peeringdb.sh
+COPY docker/run-command.sh /opt/peering-manager/run-command.sh
 COPY docker/launch-peering-manager.sh /opt/peering-manager/launch-peering-manager.sh
 COPY startup_scripts/ /opt/peering-manager/startup_scripts/
 COPY initializers/ /opt/peering-manager/initializers/
