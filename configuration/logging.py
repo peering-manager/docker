@@ -38,6 +38,14 @@
 #        }
 #    },
 #    'loggers': {
+#        'peering.manager.peeringdb': {
+#            'handlers': ['console'],
+#            'level': LOGLEVEL
+#        },
+#        'peering.manager.napalm': {
+#            'handlers': ['console'],
+#            'level': 'DEBUG'
+#        },
 #        'django': {
 #            'handlers': ['console'],
 #            'propagate': True,
