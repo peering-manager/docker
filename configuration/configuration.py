@@ -136,11 +136,12 @@ BGPQ3_ARGS = {
     "ipv6": os.environ.get("BGPQ3_ARGS_IPV6", "-r 16 -R 48").split(" "),
     "ipv4": os.environ.get("BGPQ3_ARGS_IPV4", "-r 8 -R 24").split(" "),
 }
-NETBOX_API = os.environ.get("NETBOX_API", None)
+NETBOX_API = os.environ.get("NETBOX_API", "")
 NETBOX_API_TOKEN = os.environ.get("NETBOX_API_TOKEN", read_secret("netbox_api_token"))
 NETBOX_DEVICE_ROLES = os.environ.get(
     "NETBOX_DEVICE_ROLES", "router,firewall,switch"
 ).split(",")
+NETBOX_TAGS = os.environ.get("NETBOX_TAGS", "").split(",")
 RELEASE_CHECK_URL = os.environ.get(
     "RELEASE_CHECK_URL",
     "https://api.github.com/repos/peering-manager/peering-manager/releases",
