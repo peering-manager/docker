@@ -138,6 +138,10 @@ BGPQ3_ARGS = {
 }
 NETBOX_API = os.environ.get("NETBOX_API", "")
 NETBOX_API_TOKEN = os.environ.get("NETBOX_API_TOKEN", read_secret("netbox_api_token"))
+NETBOX_API_THREADING = os.environ.get("NETBOX_API_THREADING", "False").lower() == "true"
+NETBOX_API_VERIFY_SSL = (
+    os.environ.get("NETBOX_API_VERIFY_SSL", "True").lower() == "true"
+)
 NETBOX_DEVICE_ROLES = os.environ.get("NETBOX_DEVICE_ROLES", "router,firewall").split(
     ","
 )
