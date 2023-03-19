@@ -24,8 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Get version of Peering Manager Docker
-        run: |
-          echo "::set-output name=version::$(cat VERSION)"
+        run: echo "version=$(cat VERSION)" >>"$GITHUB_OUTPUT"
         shell: bash
       - id: docker-build
         name: Build the image with '${{ matrix.build_cmd }}'

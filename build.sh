@@ -1,6 +1,8 @@
 #!/bin/bash
 # Clones the Peering Manager repository from Github and builds the Dockerfile
 
+source ./build-functions/gh-functions.sh
+
 echo "▶️ $0 $*"
 
 set -e
@@ -116,7 +118,7 @@ if [ "${2}" != "--push-only" ] && [ -z "${SKIP_GIT}" ] ; then
   REMOTE_EXISTS=$(git ls-remote --heads --tags "${URL}" "${PEERING_MANAGER_BRANCH}" | wc -l)
   if [ "${REMOTE_EXISTS}" == "0" ]; then
     echo "❌ Remote branch '${PEERING_MANAGER_BRANCH}' not found in '${URL}'; Nothing to do"
-    gh_echo "::set-output name=skipped::true"
+    gh_out "skipped=true"
     exit 0
   fi
   echo "🌐 Checking out '${PEERING_MANAGER_BRANCH}' of peering-manager from the url '${URL}' into '${PEERING_MANAGER_PATH}'"
@@ -215,7 +217,7 @@ for DOCKER_TARGET in "${DOCKER_TARGETS[@]}"; do
   else
     gh_env "FINAL_DOCKER_TAG=${TARGET_DOCKER_TAG}"
   fi
-  gh_echo "::set-output name=skipped::false"
+  gh_out "skipped=false"
 
   ###
   # composing the additional DOCKER_SHORT_TAG,
@@ -342,7 +344,7 @@ for DOCKER_TARGET in "${DOCKER_TARGETS[@]}"; do
       $DRY docker inspect "${TARGET_DOCKER_TAG}" --format "{{json .Config.Labels}}" | jq
     else
       echo "Build skipped because sources didn't change"
-      echo "::set-output name=skipped::true"
+      gh_out "skipped=true"
     fi
   fi
 

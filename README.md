@@ -10,7 +10,7 @@ This project relies only on *Docker* and *docker-compose*. Make sure to use a
 decent version of each tool and everything will work as expected.
 
 To check the version installed on your system run `docker --version` and
-`docker-compose --version`.
+`docker compose --version`.
 
 ## Getting Started
 
