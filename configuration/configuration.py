@@ -1,4 +1,5 @@
 import os
+import ast
 
 # For reference see:
 # * https://peering-manager.readthedocs.io/en/stable/configuration/required-settings/
@@ -102,7 +103,7 @@ EMAIL = {
     "USE_TLS": os.environ.get("EMAIL_USE_TLS", "False").lower() == "true",
     "SSL_CERTFILE": os.environ.get("EMAIL_SSL_CERTFILE", ""),
     "SSL_KEYFILE": os.environ.get("EMAIL_SSL_KEYFILE", ""),
-    "CC_CONTACTS": eval(f'{os.environ.get("EMAIL_CC_CONTACTS","")}'),
+    "CC_CONTACTS": ast.literal_eval(f'{os.environ.get("EMAIL_CC_CONTACTS","")}'),
 }
 
 CHANGELOG_RETENTION = int(os.environ.get("CHANGELOG_RETENTION", 90))
