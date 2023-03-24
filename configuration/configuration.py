@@ -103,8 +103,12 @@ EMAIL = {
     "USE_TLS": os.environ.get("EMAIL_USE_TLS", "False").lower() == "true",
     "SSL_CERTFILE": os.environ.get("EMAIL_SSL_CERTFILE", ""),
     "SSL_KEYFILE": os.environ.get("EMAIL_SSL_KEYFILE", ""),
-    "CC_CONTACTS": ast.literal_eval(f'{os.environ.get("EMAIL_CC_CONTACTS","")}'),
 }
+try:
+    EMAIL['CC_CONTACTS'] = ast.literal_eval(f'{os.environ.get("EMAIL_CC_CONTACTS","")}')
+except:
+    EMAIL['CC_CONTACTS'] = []
+
 
 CHANGELOG_RETENTION = int(os.environ.get("CHANGELOG_RETENTION", 90))
 JOBRESULT_RETENTION = int(os.environ.get("JOBRESULT_RETENTION", 90))
