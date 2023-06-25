@@ -1,9 +1,8 @@
 import sys
 
-from utils.enums import Colour
-from utils.models import Tag
-
+from extras.models import Tag
 from startup_script_utils import load_yaml
+from utils.enums import Colour
 
 tags = load_yaml("/opt/peering-manager/initializers/tags.yml")
 if not tags:
