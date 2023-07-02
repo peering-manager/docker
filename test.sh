@@ -73,6 +73,7 @@ trap test_cleanup EXIT ERR
 test_setup
 
 test_peeringmanager_unit_tests
-test_initializers
+# FIXME: initializers disabled until new release
+# test_initializers
 
 echo "🐳 Done testing '${IMAGE}'"
