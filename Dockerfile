@@ -26,7 +26,8 @@ RUN apk add --no-cache \
 
 ARG PEERING_MANAGER_PATH
 COPY ${PEERING_MANAGER_PATH}/requirements.txt requirements-container.txt /
-RUN /opt/peering-manager/venv/bin/pip install -r /requirements.txt -r /requirements-container.txt
+RUN /opt/peering-manager/venv/bin/pip install -r /requirements.txt
+RUN /opt/peering-manager/venv/bin/pip install -r /requirements-container.txt
 WORKDIR /peering-manager
 
 FROM alpine:3.14 as bgpq-builder
