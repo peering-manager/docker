@@ -1,6 +1,6 @@
 import sys
 
-from extras.models import Tag
+import extras.models
 from startup_script_utils import load_yaml
 from utils.enums import Colour
 
@@ -16,7 +16,7 @@ for params in tags:
             if color in color_tpl:
                 params["color"] = color_tpl[0]
 
-    tag, created = Tag.objects.get_or_create(**params)
+    tag, created = tags.Tag.objects.get_or_create(**params)
 
     if created:
         print(f"🎨 Created tag '{tag.name}'")
