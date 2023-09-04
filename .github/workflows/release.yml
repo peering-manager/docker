@@ -22,7 +22,7 @@ jobs:
       GH_ACTION: enable
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Get version of Peering Manager Docker
         run: echo "version=$(cat VERSION)" >>"$GITHUB_OUTPUT"
         shell: bash
