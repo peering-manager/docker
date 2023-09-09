@@ -1,6 +1,10 @@
 import sys
 
-from extras.models import Tag
+try:
+    from extras.models import Tag
+except ImportError:
+    from utils.models import Tag
+
 from startup_script_utils import load_yaml
 from utils.enums import Colour
 
