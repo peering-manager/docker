@@ -4,7 +4,7 @@ version: "3.4"
 services:
   peering-manager:
     &peering-manager
-    image: peeringmanager/peering-manager:${VERSION-v1.7}
+    image: docker.io/peeringmanager/peering-manager:${VERSION-v1.8}
     env_file: env/peering-manager.env
     user: "unit:root"
     volumes:
@@ -15,6 +15,11 @@ services:
       - postgres
       - redis
       - rqworker
+    healthcheck:
+      start_period: 60s
+      timeout: 3s
+      interval: 15s
+      test: "curl -f http://localhost:8080/api/ || exit 1"
   rqworker:
     <<: *peering-manager
     depends_on:
@@ -24,6 +29,11 @@ services:
       - /opt/peering-manager/venv/bin/python
       - /opt/peering-manager/manage.py
       - rqworker
+    healthcheck:
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      test: "ps -a | grep -v grep | grep -q rqworker || exit 1"
   housekeeping:
     <<: *peering-manager
     environment:
@@ -34,6 +44,11 @@ services:
     command:
       - /opt/peering-manager/run-command.sh
       - housekeeping
+    healthcheck:
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      test: "ps -a | grep -v grep | grep -q housekeeping || exit 1"
   peeringdb-sync:
     <<: *peering-manager
     environment:
@@ -44,13 +59,18 @@ services:
     command:
       - /opt/peering-manager/run-command.sh
       - peeringdb_sync
+    healthcheck:
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      test: "ps -a | grep -v grep | grep -q peeringdb_sync || exit 1"
   postgres:
-    image: postgres:14-alpine
+    image: docker.io/postgres:14-alpine
     env_file: env/postgres.env
     volumes:
       - peering-manager-data:/var/lib/postgresql/data
   redis:
-    image: redis:7-alpine
+    image: docker.io/redis:7-alpine
     env_file: env/redis.env
     volumes:
       - peering-manager-redis:/data

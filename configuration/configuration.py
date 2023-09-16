@@ -33,8 +33,11 @@ def get_sys_tz():
 # The server will not permit write access to the server via any other
 # hostnames. The first FQDN in the list will be treated as the preferred name.
 #
-# Example: ALLOWED_HOSTS = ['peering.example.com', 'peering.internal.local']
+# Example: ALLOWED_HOSTS = ["peering.example.com", "peering.internal.local"]
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(" ")
+# ensure that "*" or "localhost" is always in ALLOWED_HOSTS (needed for health checks)
+if "*" not in ALLOWED_HOSTS and "localhost" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append("localhost")
 
 # Must be unique to each setup (CHANGE IT!).
 SECRET_KEY = os.environ.get("SECRET_KEY", read_secret("secret_key"))

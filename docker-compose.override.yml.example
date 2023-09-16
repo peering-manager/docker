@@ -3,3 +3,5 @@ services:
   peering-manager:
     ports:
       - 8080
+    healthcheck:
+      start_period: 90s

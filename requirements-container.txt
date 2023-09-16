@@ -1,5 +1,2 @@
 ruamel.yaml
 django-auth-ldap
-
-# Fix for https://github.com/peering-manager/peering-manager/issues/725
-django-rq==2.8.0
