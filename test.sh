@@ -28,7 +28,7 @@ if [ -z "${IMAGE}" ]; then
 fi
 
 # The docker compose command to use
-doco="docker-compose --file docker-compose.test.yml --project-name peeringmanager_docker_test_${1}"
+doco="docker compose --file docker-compose.test.yml --project-name peeringmanager_docker_test_${1}"
 INITIALIZERS_DIR=".initializers"
 
 test_setup() {
