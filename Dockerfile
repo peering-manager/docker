@@ -1,4 +1,4 @@
-FROM alpine:3.14 as builder
+FROM alpine:3.19 as builder
 
 RUN apk add --no-cache \
     bash \
@@ -30,7 +30,7 @@ RUN /opt/peering-manager/venv/bin/pip install -r /requirements.txt
 RUN /opt/peering-manager/venv/bin/pip install -r /requirements-container.txt
 WORKDIR /peering-manager
 
-FROM alpine:3.14 as bgpq-builder
+FROM alpine:3.19 as bgpq-builder
 
 RUN mkdir app && \
     apk add --no-cache build-base autoconf automake gcc git libtool linux-headers musl-dev
@@ -44,14 +44,14 @@ RUN mkdir /bgpq3 && \
 WORKDIR /bgp4
 
 RUN mkdir /bgpq4 && \
-    git clone https://github.com/bgp/bgpq4.git . && git checkout 1.7 && \
+    git clone https://github.com/bgp/bgpq4.git . && git checkout 1.12 && \
     ./bootstrap && ./configure && make install 
 
 ##############
 # Main stage #
 ##############
 
-FROM alpine:3.14 as main
+FROM alpine:3.19 as main
 
 RUN apk add --no-cache \
     bash \
