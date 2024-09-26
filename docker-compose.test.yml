@@ -1,5 +1,4 @@
 ---
-version: "3.4"
 services:
   peering-manager:
     image: ${IMAGE-peeringmanager/peering-manager:latest}
