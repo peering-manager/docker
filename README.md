@@ -39,5 +39,3 @@ and override definitions from this file.
 This work is based on the great
 [netbox-docker](https://github.com/netbox-community/netbox-docker) project and
 uses the same license.
-
-
