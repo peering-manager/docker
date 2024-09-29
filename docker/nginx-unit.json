@@ -1,24 +1,45 @@
 {
     "listeners": {
-        "*:8080": {
-            "pass": "routes"
+        "0.0.0.0:8080": {
+            "pass": "routes/main"
+        },
+        "[::]:8080": {
+            "pass": "routes/main"
+        },
+        "0.0.0.0:8081": {
+            "pass": "routes/status"
+        },
+        "[::]:8081": {
+            "pass": "routes/status"
         }
     },
-    "routes": [
-        {
-            "match": {
-                "uri": "/static/*"
+    "routes": {
+        "main": [
+            {
+                "match": {
+                    "uri": "/static/*"
+                },
+                "action": {
+                    "share": "/opt/peering-manager${uri}"
+                }
             },
-            "action": {
-                "share": "/opt/peering-manager/"
+            {
+                "action": {
+                    "pass": "applications/peeringmanager"
+                }
             }
-        },
-        {
-            "action": {
-                "pass": "applications/peeringmanager"
+        ],
+        "status": [
+            {
+                "match": {
+                    "uri": "/status/*"
+                },
+                "action": {
+                    "proxy": "http://unix:/opt/unit/unit.sock"
+                }
             }
-        }
-    ],
+        ]
+    },
     "applications": {
         "peeringmanager": {
             "type": "python 3",
