@@ -3,8 +3,12 @@ services:
   peering-manager:
     image: ${IMAGE-peeringmanager/peering-manager:latest}
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
     env_file: env/peering-manager.env
     environment:
       SKIP_STARTUP_SCRIPTS: ${SKIP_STARTUP_SCRIPTS-false}
@@ -13,13 +17,35 @@ services:
       - ./startup_scripts:/opt/peering-manager/startup_scripts:z,ro
       - ./${INITIALIZERS_DIR-initializers}:/opt/peering-manager/initializers:z,ro
       - ./configuration:/etc/peering-manager/config:z,ro
+    healthcheck:
+      test: curl -f http://localhost:8080/login/ || exit 1
+      start_period: ${NETBOX_START_PERIOD-120s}
+      timeout: 3s
+      interval: 15s
+
   postgres:
-    image: postgres:14-alpine
+    image: postgres:17-alpine
     env_file: env/postgres.env
-  redis:
-    image: redis:6-alpine
-    env_file: env/redis.env
+    healthcheck:
+      test: pg_isready -q -t 2 -d $$POSTGRES_DB -U $$POSTGRES_USER ## $$ because of docker-compose
+      start_period: 20s
+      interval: 1s
+      timeout: 5s
+      retries: 5
+
+  redis: &redis
+    image: docker.io/valkey/valkey:8.0-alpine
     command:
-      - sh
-      - -c # this is to evaluate the $REDIS_PASSWORD from the env
-      - redis-server --appendonly yes --requirepass $$REDIS_PASSWORD ## $$ because of docker-compose
+    - sh
+    - -c # this is to evaluate the $REDIS_PASSWORD from the env
+    - valkey-server --save "" --appendonly no --requirepass $$REDIS_PASSWORD ## $$ because of docker-compose
+    env_file: env/redis.env
+    healthcheck:
+      test: "[ $$(valkey-cli --pass \"$${REDIS_PASSWORD}\" ping) = 'PONG' ]"
+      start_period: 5s
+      timeout: 3s
+      interval: 1s
+      retries: 5
+  redis-cache:
+    <<: *redis
+    env_file: env/redis-cache.env
