@@ -6,8 +6,8 @@ UNIT_SOCKET="/opt/unit/unit.sock"
 load_configuration() {
   MAX_WAIT=10
   WAIT_COUNT=0
-  while [ ! -S $UNIT_SOCKET ]; do
-    if [ $WAIT_COUNT -ge $MAX_WAIT ]; then
+  while [ ! -S ${UNIT_SOCKET} ]; do
+    if [ ${WAIT_COUNT} -ge ${MAX_WAIT} ]; then
       echo "⚠️  No control socket found; configuration will not be loaded."
       return 1
     fi
@@ -20,9 +20,9 @@ load_configuration() {
 
   # even when the control socket exists, it does not mean unit has finished initialisation
   # this curl call will get a reply once unit is fully launched
-  curl --silent --output /dev/null --request GET --unix-socket $UNIT_SOCKET http://localhost/
+  curl --silent --output /dev/null --request GET --unix-socket ${UNIT_SOCKET} http://localhost/
 
-  echo "⚠️  Applying configuration from $UNIT_CONFIG"
+  echo "⚠️  Applying configuration from ${UNIT_CONFIG}"
 
   RESP_CODE=$(
     curl \
@@ -34,7 +34,7 @@ load_configuration() {
       --unix-socket $UNIT_SOCKET \
       http://localhost/config
   )
-  if [ "$RESP_CODE" != "200" ]; then
+  if [ "${RESP_CODE}" != "200" ]; then
     echo "⚠ Could no load Unit configuration"
     kill "$(cat /opt/unit/unit.pid)"
     return 1
@@ -47,10 +47,10 @@ load_configuration &
 
 exec unitd \
   --no-daemon \
-  --control unix:$UNIT_SOCKET \
+  --control unix:${UNIT_SOCKET} \
   --pid /opt/unit/unit.pid \
   --log /dev/stdout \
-  --state /opt/unit/state/ \
-  --tmp /opt/unit/tmp/ \
+  --statedir /opt/unit/state/ \
+  --tmpdir /opt/unit/tmp/ \
   --user unit \
   --group root
