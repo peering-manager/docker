@@ -14,8 +14,6 @@ services:
       SKIP_STARTUP_SCRIPTS: ${SKIP_STARTUP_SCRIPTS-false}
     user: "unit:root"
     volumes:
-      - ./startup_scripts:/opt/peering-manager/startup_scripts:z,ro
-      - ./${INITIALIZERS_DIR-initializers}:/opt/peering-manager/initializers:z,ro
       - ./configuration:/etc/peering-manager/config:z,ro
     healthcheck:
       test: curl -f http://localhost:8080/login/ || exit 1

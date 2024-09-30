@@ -33,23 +33,10 @@ fi
 
 # The docker compose command to use
 doco="docker compose --file docker-compose.test.yml --file docker-compose.test.override.yml --project-name peeringmanager_docker_test"
-INITIALIZERS_DIR=".initializers"
 
 test_setup() {
   gh_echo "::group:: Test setup"
   echo "🏗  Setup up test environment"
-
-  if [ -d "${INITIALIZERS_DIR}" ]; then
-    rm -rf "${INITIALIZERS_DIR}"
-  fi
-
-  mkdir "${INITIALIZERS_DIR}"
-  (
-    cd initializers
-    for script in *.yml; do
-      sed -E 's/^# //' "${script}" > "../${INITIALIZERS_DIR}/${script}"
-    done
-  )
 
   $doco up --detach --quiet-pull --wait --force-recreate --renew-anon-volumes --no-start
   $doco start postgres
@@ -112,10 +99,6 @@ test_cleanup() {
   gh_echo "::group:: Docker compose down"
   $doco down --volumes
   gh_echo "::endgroup::"
-
-  if [ -d "${INITIALIZERS_DIR}" ]; then
-    rm -rf "${INITIALIZERS_DIR}"
-  fi
 }
 
 echo "🐳 Start testing '${IMAGE}'"

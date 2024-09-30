@@ -88,8 +88,6 @@ COPY docker/ldap_config.docker.py /opt/peering-manager/peering_manager/ldap_conf
 COPY docker/docker-entrypoint.sh /opt/peering-manager/docker-entrypoint.sh
 COPY docker/run-command.sh /opt/peering-manager/run-command.sh
 COPY docker/launch-peering-manager.sh /opt/peering-manager/launch-peering-manager.sh
-COPY startup_scripts/ /opt/peering-manager/startup_scripts/
-COPY initializers/ /opt/peering-manager/initializers/
 COPY configuration/ /etc/peering-manager/config/
 COPY docker/nginx-unit.json /etc/unit/
 

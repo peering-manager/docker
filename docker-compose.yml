@@ -15,8 +15,6 @@ services:
       timeout: 3s
       interval: 15s
     volumes:
-      - ./startup_scripts:/opt/peering-manager/startup_scripts:z,ro
-      - ./initializers:/opt/peering-manager/initializers:z,ro
       - ./configuration:/etc/peering-manager/config:z,ro
   rqworker:
     <<: *peering-manager
