@@ -10,8 +10,6 @@ services:
       redis-cache:
         condition: service_healthy
     env_file: env/peering-manager.env
-    environment:
-      SKIP_STARTUP_SCRIPTS: ${SKIP_STARTUP_SCRIPTS-false}
     user: "unit:root"
     volumes:
       - ./configuration:/etc/peering-manager/config:z,ro

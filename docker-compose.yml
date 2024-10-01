@@ -33,7 +33,7 @@ services:
   housekeeping:
     <<: *peering-manager
     environment:
-      - COMMAND_INTERVAL=86400
+      COMMAND_INTERVAL: 86400
     depends_on:
       peering-manager:
         condition: service_healthy
@@ -48,7 +48,7 @@ services:
   peeringdb-sync:
     <<: *peering-manager
     environment:
-      - COMMAND_INTERVAL=86400
+      COMMAND_INTERVAL: 86400
     depends_on:
       peering-manager:
         condition: service_healthy
