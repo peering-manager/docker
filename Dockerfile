@@ -100,7 +100,9 @@ RUN mkdir -p static /opt/unit/state/ /opt/unit/tmp/ \
     && chown -R unit:root /opt/unit/ \
     && chmod -R g+w /opt/unit/ \
     && cd /opt/peering-manager/ \
-    && SECRET_KEY="dummy" /opt/peering-manager/venv/bin/python /opt/peering-manager/manage.py collectstatic --no-input
+    && SECRET_KEY="dummy" /opt/peering-manager/venv/bin/python /opt/peering-manager/manage.py collectstatic --no-input \
+    && chown -R unit:root /opt/peering-manager/ \
+    && chmod -R g+w /opt/peering-manager/
 
 ENV LANG=C.utf8 PATH=/opt/peering-manager/venv/bin:$PATH
 ENTRYPOINT [ "/sbin/tini", "--" ]
