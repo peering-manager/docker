@@ -57,6 +57,11 @@ VERSION=$($CURL "${CURL_ARGS[@]}" "${URL_RELEASES}" | jq -r "${JQ_LATEST}" 2>/de
 # Check if the prerelease version is actually higher than stable version
 ###
 if [ "${PRERELEASE}" == "true" ]; then
+  if [ -z "$VERSION" ]; then
+    echo "❎ No prerelease version found, ignoring build."
+    exit 0
+  fi
+
   JQ_STABLE="group_by(.prerelease) | .[] | sort_by(.published_at) | reverse | .[0] | select(.prerelease==false) | .tag_name"
   STABLE_VERSION=$($CURL "${CURL_ARGS[@]}" "${URL_RELEASES}" | jq -r "${JQ_STABLE}" 2>/dev/null)
 
