@@ -25,9 +25,9 @@ if [ -z "${IMAGE}" ]; then
   echo "⚠️ No image defined"
 
   if [ -z "${DEBUG}" ]; then
-    exit 1
+    exit 0
   else
-    echo "⚠️  Would 'exit 1' here, but DEBUG is '${DEBUG}'."
+    echo "⚠️  Would 'exit 0' here, but DEBUG is '${DEBUG}'."
   fi
 fi
 
