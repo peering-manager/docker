@@ -429,6 +429,12 @@ if "GIT_COMMIT_MESSAGE" in environ:
         "GIT_COMMIT_MESSAGE", "Committed using Peering Manager"
     )
 
+# Perform validation of the value when creating or updating a BGP community
+if "VALIDATE_BGP_COMMUNITY_VALUE" in environ:
+    VALIDATE_BGP_COMMUNITY_VALUE = _environ_get_and_map(
+        "VALIDATE_BGP_COMMUNITY_VALUE", "True", _AS_BOOL
+    )
+
 # When merging configuration contexts, Peering Manager needs to know what
 # should happen to nested dictionaries/hashes and to list. These two options
 # can be changed to reproduce the wanted behaviour. They are similar to
