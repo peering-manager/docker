@@ -23,6 +23,7 @@ jobs:
           - ./build.sh main
         os:
           - ubuntu-latest
+          # - macos-latest
       fail-fast: false
     env:
       GH_ACTION: enable
@@ -36,15 +37,17 @@ jobs:
       - name: Set up Docker Buildx
         id: buildx-setup
         uses: docker/setup-buildx-action@v3
-      - name: Set BUILDX_PLATFORM to AMD64,ARM64
-        run: echo "BUILDX_PLATFORM=linux/amd64,linux/arm64" >>"${GITHUB_ENV}"
+      # - name: Set BUILDX_PLATFORM to ARM64
+      #   if: matrix.os == 'macos-latest'
+      #   run: echo "BUILDX_PLATFORM=linux/arm64" >>"${GITHUB_ENV}"
       - name: Build the image for '${{ matrix.os }}' with '${{ matrix.build_cmd }}'
         id: docker-build
         run: ${{ matrix.build_cmd }}
         env:
           BUILDX_BUILDER_NAME: ${{ steps.buildx-setup.outputs.name }}
-      - name: Set Peering Manager container start_period higher on ARM64
-        run: echo "PEERINGMANAGER_START_PERIOD=240s" >>"${GITHUB_ENV}"
+      # - name: Set Peering Manager container start_period higher on ARM64
+      #   if: matrix.os == 'macos-latest'
+      #   run: echo "PEERINGMANAGER_START_PERIOD=240s" >>"${GITHUB_ENV}"
       - name: Test the image
         run: IMAGE="${FINAL_DOCKER_TAG}" ./test.sh
         if: steps.docker-build.outputs.skipped != 'true'
