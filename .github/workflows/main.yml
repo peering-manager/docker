@@ -23,7 +23,7 @@ jobs:
           - ./build.sh main
         os:
           - ubuntu-latest
-          - macos-latest
+          # - macos-latest
       fail-fast: false
     env:
       GH_ACTION: enable
@@ -37,9 +37,9 @@ jobs:
       - name: Set up Docker Buildx
         id: buildx-setup
         uses: docker/setup-buildx-action@v3
-      - name: Set BUILDX_PLATFORM to ARM64
-        if: matrix.os == 'macos-latest'
-        run: echo "BUILDX_PLATFORM=linux/arm64" >>"${GITHUB_ENV}"
+      # - name: Set BUILDX_PLATFORM to ARM64
+      #   if: matrix.os == 'macos-latest'
+      #   run: echo "BUILDX_PLATFORM=linux/arm64" >>"${GITHUB_ENV}"
       - name: Build the image for '${{ matrix.os }}' with '${{ matrix.build_cmd }}'
         id: docker-build
         run: ${{ matrix.build_cmd }}
