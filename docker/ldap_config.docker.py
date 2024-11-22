@@ -1,4 +1,4 @@
-from .configuration import read_configurations
+from .configuration import read_configurations  # type: ignore
 
 _loaded_configurations = read_configurations(
     config_dir="/etc/peering-manager/config/ldap/",
@@ -11,7 +11,7 @@ def __getattr__(name):
     for config in _loaded_configurations:
         try:
             return getattr(config, name)
-        except:
+        except Exception:
             pass
     raise AttributeError
 

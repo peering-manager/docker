@@ -1,4 +1,5 @@
-FROM alpine:3.19 as builder
+ARG FROM
+FROM ${FROM} AS builder
 
 RUN apk add --no-cache \
     bash \
@@ -26,11 +27,11 @@ RUN apk add --no-cache \
 
 ARG PEERING_MANAGER_PATH
 COPY ${PEERING_MANAGER_PATH}/requirements.txt requirements-container.txt /
-RUN /opt/peering-manager/venv/bin/pip install -r /requirements.txt
-RUN /opt/peering-manager/venv/bin/pip install -r /requirements-container.txt
-WORKDIR /peering-manager
+RUN \
+    sed -i -e 's/social-auth-core/social-auth-core\[all\]/g' /requirements.txt && \
+    /opt/peering-manager/venv/bin/pip install -r /requirements.txt -r /requirements-container.txt
 
-FROM alpine:3.19 as bgpq-builder
+FROM ${FROM} AS bgpq-builder
 
 RUN mkdir app && \
     apk add --no-cache build-base autoconf automake gcc git libtool linux-headers musl-dev
@@ -51,7 +52,7 @@ RUN mkdir /bgpq4 && \
 # Main stage #
 ##############
 
-FROM alpine:3.19 as main
+FROM ${FROM} AS main
 
 RUN apk add --no-cache \
     bash \
@@ -60,6 +61,8 @@ RUN apk add --no-cache \
     libevent \
     libffi \
     libjpeg-turbo \
+    libldap \
+    libsasl \
     libxslt \
     openssl \
     postgresql-client \
@@ -68,9 +71,8 @@ RUN apk add --no-cache \
     python3 \
     tini \
     unit \
-    unit-python3
-
-WORKDIR /opt
+    unit-python3 \
+    util-linux
 
 COPY --from=builder /opt/peering-manager/venv /opt/peering-manager/venv
 COPY --from=bgpq-builder /usr/local/bin/bgpq3 /usr/local/bin/bgpq3
@@ -78,13 +80,14 @@ COPY --from=bgpq-builder /usr/local/bin/bgpq4 /usr/local/bin/bgpq4
 
 ARG PEERING_MANAGER_PATH
 COPY ${PEERING_MANAGER_PATH} /opt/peering-manager
+# Copy the modified 'requirements*.txt' files, to have the files actually used during installation
+COPY --from=builder /requirements.txt /requirements-container.txt /opt/peering-manager/
 
 COPY docker/configuration.docker.py /opt/peering-manager/peering_manager/configuration.py
+COPY docker/ldap_config.docker.py /opt/peering-manager/peering_manager/ldap_config.py
 COPY docker/docker-entrypoint.sh /opt/peering-manager/docker-entrypoint.sh
 COPY docker/run-command.sh /opt/peering-manager/run-command.sh
 COPY docker/launch-peering-manager.sh /opt/peering-manager/launch-peering-manager.sh
-COPY startup_scripts/ /opt/peering-manager/startup_scripts/
-COPY initializers/ /opt/peering-manager/initializers/
 COPY configuration/ /etc/peering-manager/config/
 COPY docker/nginx-unit.json /etc/unit/
 
@@ -97,8 +100,11 @@ RUN mkdir -p static /opt/unit/state/ /opt/unit/tmp/ \
     && chown -R unit:root /opt/unit/ \
     && chmod -R g+w /opt/unit/ \
     && cd /opt/peering-manager/ \
-    && SECRET_KEY="dummy" /opt/peering-manager/venv/bin/python /opt/peering-manager/manage.py collectstatic --no-input
+    && SECRET_KEY="dummy" /opt/peering-manager/venv/bin/python /opt/peering-manager/manage.py collectstatic --no-input \
+    && chown -R unit:root /opt/peering-manager/ \
+    && chmod -R g+w /opt/peering-manager/
 
+ENV LANG=C.utf8 PATH=/opt/peering-manager/venv/bin:$PATH
 ENTRYPOINT [ "/sbin/tini", "--" ]
 
 CMD [ "/opt/peering-manager/docker-entrypoint.sh", "/opt/peering-manager/launch-peering-manager.sh" ]
@@ -118,14 +124,4 @@ LABEL ORIGINAL_TAG="" \
     org.opencontainers.image.documentation="https://github.com/peering-manager/docker" \
     org.opencontainers.image.source="https://github.com/peering-manager/docker.git" \
     org.opencontainers.image.revision="" \
-    org.opencontainers.image.version="snapshot"
-
-###################
-## LDAP specific ##
-###################
-
-FROM main as ldap
-
-RUN apk add --no-cache libldap libsasl util-linux
-
-COPY docker/ldap_config.docker.py /opt/peering-manager/peering_manager/ldap_config.py
+    org.opencontainers.image.version=""

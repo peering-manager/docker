@@ -23,7 +23,7 @@ gh_env() {
 ###
 # Prints the output to the file defined in ${GITHUB_OUTPUT}.
 # Only executes if ${GH_ACTION} is defined.
-# Example Usage: gh_out "FOO_VAR=bar_value"
+# Example Usage: gh_env "FOO_VAR=bar_value"
 ###
 gh_out() {
   if [ -n "${GH_ACTION}" ]; then

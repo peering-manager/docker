@@ -2,13 +2,13 @@ from importlib import import_module
 from os import environ
 
 import ldap
-from django_auth_ldap.config import LDAPSearch
+from django_auth_ldap.config import LDAPSearch  # type: ignore
 
 
-# Read secret from file.
-def _read_secret(secret_name, default=None):
+# Read secret from file
+def _read_secret(secret_name: str, default: str | None = None) -> str | None:
     try:
-        f = open("/run/secrets/" + secret_name, "r", encoding="utf-8")
+        f = open(f"/run/secrets/{secret_name}", encoding="utf-8")
     except EnvironmentError:
         return default
     else:
@@ -16,12 +16,12 @@ def _read_secret(secret_name, default=None):
             return f.readline().strip()
 
 
-# Import and return the group type based on string name.
-def _import_group_type(group_type_name):
+# Import and return the group type based on string name
+def _import_group_type(group_type_name: str):
     mod = import_module("django_auth_ldap.config")
     try:
         return getattr(mod, group_type_name)()
-    except:
+    except Exception:
         return None
 
 
@@ -31,32 +31,60 @@ AUTH_LDAP_SERVER_URI = environ.get("AUTH_LDAP_SERVER_URI", "")
 # The following may be needed if you are binding to Active Directory.
 AUTH_LDAP_CONNECTION_OPTIONS = {ldap.OPT_REFERRALS: 0}
 
-# Set the DN and password for the NetBox service account.
-AUTH_LDAP_BIND_DN = environ.get("AUTH_LDAP_BIND_DN", "")
-AUTH_LDAP_BIND_PASSWORD = _read_secret(
-    "auth_ldap_bind_password", environ.get("AUTH_LDAP_BIND_PASSWORD", "")
+AUTH_LDAP_BIND_AS_AUTHENTICATING_USER = (
+    environ.get("AUTH_LDAP_BIND_AS_AUTHENTICATING_USER", "False").lower() == "true"
 )
 
-# Set a string template that describes any user’s distinguished name based on
-# the username.
+# Set the DN and password for the Peering Manager service account if needed.
+if not AUTH_LDAP_BIND_AS_AUTHENTICATING_USER:
+    AUTH_LDAP_BIND_DN = environ.get("AUTH_LDAP_BIND_DN", "")
+    AUTH_LDAP_BIND_PASSWORD = _read_secret(
+        "auth_ldap_bind_password", environ.get("AUTH_LDAP_BIND_PASSWORD", "")
+    )
+
+# Set a string template that describes any user’s distinguished name based on the
+# username.
 AUTH_LDAP_USER_DN_TEMPLATE = environ.get("AUTH_LDAP_USER_DN_TEMPLATE", None)
 
 # Enable STARTTLS for ldap authentication.
 AUTH_LDAP_START_TLS = environ.get("AUTH_LDAP_START_TLS", "False").lower() == "true"
+
+# Include this setting if you want to ignore certificate errors. This might be needed
+# to accept a self-signed cert.
+# Note that this is a Peering Manager-specific setting which sets:
+#     ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
+LDAP_IGNORE_CERT_ERRORS = (
+    environ.get("LDAP_IGNORE_CERT_ERRORS", "False").lower() == "true"
+)
+
+# Include this setting if you want to validate the LDAP server certificates against a
+# CA certificate directory on your server
+# Note that this is a Peering Manager-specific setting which sets:
+#     ldap.set_option(ldap.OPT_X_TLS_CACERTDIR, LDAP_CA_CERT_DIR)
+LDAP_CA_CERT_DIR = environ.get("LDAP_CA_CERT_DIR", None)
+
+# Include this setting if you want to validate the LDAP server certificates against
+# your own CA.
+# Note that this is a Peering Manager-specific setting which sets:
+#     ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, LDAP_CA_CERT_FILE)
+LDAP_CA_CERT_FILE = environ.get("LDAP_CA_CERT_FILE", None)
 
 AUTH_LDAP_USER_SEARCH_BASEDN = environ.get("AUTH_LDAP_USER_SEARCH_BASEDN", "")
 AUTH_LDAP_USER_SEARCH_ATTR = environ.get("AUTH_LDAP_USER_SEARCH_ATTR", "sAMAccountName")
 AUTH_LDAP_USER_SEARCH_FILTER = environ.get(
     "AUTH_LDAP_USER_SEARCH_FILTER", f"({AUTH_LDAP_USER_SEARCH_ATTR}=%(user)s)"
 )
+
 AUTH_LDAP_USER_SEARCH = LDAPSearch(
     AUTH_LDAP_USER_SEARCH_BASEDN, ldap.SCOPE_SUBTREE, AUTH_LDAP_USER_SEARCH_FILTER
 )
 
-# This search ought to return all groups to which the user belongs.
-# django_auth_ldap uses this to determine group hierarchy.
+# This search ought to return all groups to which the user belongs. django_auth_ldap
+# uses this to determine group hierarchy.
+
 AUTH_LDAP_GROUP_SEARCH_BASEDN = environ.get("AUTH_LDAP_GROUP_SEARCH_BASEDN", "")
 AUTH_LDAP_GROUP_SEARCH_CLASS = environ.get("AUTH_LDAP_GROUP_SEARCH_CLASS", "group")
+
 AUTH_LDAP_GROUP_SEARCH_FILTER = environ.get(
     "AUTH_LDAP_GROUP_SEARCH_FILTER", f"(objectclass={AUTH_LDAP_GROUP_SEARCH_CLASS})"
 )
@@ -70,8 +98,8 @@ AUTH_LDAP_GROUP_TYPE = _import_group_type(
 # Define a group required to login.
 AUTH_LDAP_REQUIRE_GROUP = environ.get("AUTH_LDAP_REQUIRE_GROUP_DN")
 
-# Define special user types using groups. Exercise great caution when
-# assigning superuser status.
+# Define special user types using groups. Exercise great caution when assigning
+# superuser status.
 AUTH_LDAP_USER_FLAGS_BY_GROUP = {}
 
 if AUTH_LDAP_REQUIRE_GROUP is not None:
@@ -87,7 +115,7 @@ AUTH_LDAP_FIND_GROUP_PERMS = (
 )
 AUTH_LDAP_MIRROR_GROUPS = environ.get("AUTH_LDAP_MIRROR_GROUPS", "").lower() == "true"
 
-# Cache groups for one hour to reduce LDAP traffic.
+# Cache groups for one hour to reduce LDAP traffic
 AUTH_LDAP_CACHE_TIMEOUT = int(environ.get("AUTH_LDAP_CACHE_TIMEOUT", 3600))
 
 # Populate the Django user from the LDAP directory.

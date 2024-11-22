@@ -34,7 +34,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-.initializers
+docker-compose.override.yml
 configuration/*
 !configuration/configuration.py
 !configuration/extra.py

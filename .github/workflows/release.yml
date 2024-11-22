@@ -7,6 +7,7 @@ on:
       - published
   schedule:
     - cron: '45 5 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -14,24 +15,36 @@ jobs:
       matrix:
         build_cmd:
           - ./build-latest.sh
+          - PRERELEASE=true ./build-latest.sh
           - ./build.sh main
+        platform:
+          - linux/amd64,linux/arm64
       fail-fast: false
     runs-on: ubuntu-latest
-    name: Build new images
+    name: Build new Peering Manager Docker images
     env:
       GH_ACTION: enable
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      IMAGE_NAMES: docker.io/peeringmanager/peering-manager ghcr.io/peering-manager/peering-manager
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Get version of Peering Manager Docker
         run: echo "version=$(cat VERSION)" >>"$GITHUB_OUTPUT"
         shell: bash
-      - id: docker-build
-        name: Build the image with '${{ matrix.build_cmd }}'
+      - name: Check if the build is needed for '${{ matrix.build_cmd }}'
+        id: check-build-needed
+        env:
+          CHECK_ONLY: "true"
         run: ${{ matrix.build_cmd }}
-      - name: Test the image
-        run: IMAGE="${FINAL_DOCKER_TAG}" ./test.sh
-        if: steps.docker-build.outputs.skipped != 'true'
+      - name: Set up Docker Buildx
+        id: buildx-setup
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: "lab:latest"
+          driver: cloud
+          endpoint: "peeringmanager/peering-manager-default"
+        if: steps.check-build-needed.outputs.skipped != 'true'
       # docker.io
       - name: Login to docker.io
         uses: docker/login-action@v3
@@ -39,10 +52,7 @@ jobs:
           registry: docker.io
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-        if: steps.docker-build.outputs.skipped != 'true'
-      - name: Push the image to docker.io
-        run: ${{ matrix.build_cmd }} --push-only
-        if: steps.docker-build.outputs.skipped != 'true'
+        if: steps.check-build-needed.outputs.skipped != 'true'
       # ghcr.io
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -50,10 +60,10 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-        if: steps.docker-build.outputs.skipped != 'true'
-      - name: Push the image to ghcr.io
+        if: steps.check-build-needed.outputs.skipped != 'true'
+      - name: Push the image
         run: ${{ matrix.build_cmd }} --push
+        if: steps.check-build-needed.outputs.skipped != 'true'
         env:
-          DOCKER_REGISTRY: ghcr.io
-          DOCKER_ORG: peering-manager
-        if: steps.docker-build.outputs.skipped != 'true'
+          BUILDX_PLATFORM: ${{ matrix.platform }}
+          BUILDX_BUILDER_NAME: ${{ steps.buildx-setup.outputs.name }}
