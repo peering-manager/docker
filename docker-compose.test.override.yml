@@ -1,5 +1,7 @@
 ---
 services:
   peering-manager:
+    environment:
+      CENSUS_REPORTING_ENABLED: false
     ports:
       - "127.0.0.1:8000:8080"
