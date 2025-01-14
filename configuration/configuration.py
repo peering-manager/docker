@@ -197,13 +197,14 @@ EMAIL = {
     "PORT": _environ_get_and_map("EMAIL_PORT", "25", _AS_INT),
     "USERNAME": environ.get("EMAIL_USERNAME", ""),
     "PASSWORD": _read_secret("email_password", environ.get("EMAIL_PASSWORD", "")),
+    "TIMEOUT": _environ_get_and_map("EMAIL_TIMEOUT", "10", _AS_INT),  # seconds
+    "FROM_ADDRESS": environ.get("EMAIL_FROM_ADDRESS", ""),
+    "SUBJECT_PREFIX": environ.get("EMAIL_SUBJECT_PREFIX", ""),
     "USE_SSL": _environ_get_and_map("EMAIL_USE_SSL", "False", _AS_BOOL),
     "USE_TLS": _environ_get_and_map("EMAIL_USE_TLS", "False", _AS_BOOL),
-    "SSL_CERTFILE": environ.get("EMAIL_SSL_CERTFILE", ""),
     "SSL_KEYFILE": environ.get("EMAIL_SSL_KEYFILE", ""),
-    "TIMEOUT": _environ_get_and_map("EMAIL_TIMEOUT", "10", _AS_INT),  # seconds
-    "FROM_EMAIL": environ.get("EMAIL_FROM_ADDRESS", ""),
-    "EMAIL_CC_CONTACTS": _environ_get_and_map("EMAIL_CC_CONTACTS", "[]", _AS_STRUCT),
+    "SSL_CERTFILE": environ.get("EMAIL_SSL_CERTFILE", ""),
+    "CC_CONTACTS": _environ_get_and_map("EMAIL_CC_CONTACTS", "[]", _AS_STRUCT),
 }
 
 # By default, Peering Manager sends census reporting data using a single HTTP request
