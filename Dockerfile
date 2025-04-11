@@ -13,6 +13,7 @@ RUN apk add --no-cache \
     libevent-dev \
     libffi-dev \
     libxslt-dev \
+    xmlsec-dev \
     make \
     musl-dev \
     openldap-dev \
