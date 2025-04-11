@@ -378,6 +378,10 @@ BGPQ3_ARGS = {
     "ipv6": _environ_get_and_map("BGPQ3_ARGS_IPV6", "-r 16 -R 48", _AS_LIST),
     "ipv4": _environ_get_and_map("BGPQ3_ARGS_IPV4", "-r 8 -R 24", _AS_LIST),
 }
+if "BGPQ4_KEEP_SOURCE_IN_SET" in environ:
+    BGPQ4_KEEP_SOURCE_IN_SET = _environ_get_and_map(
+        "BGPQ4_KEEP_SOURCE_IN_SET", "False", _AS_BOOL
+    )
 
 if "NETBOX_API" in environ:
     NETBOX_API = environ.get("NETBOX_API", "")
