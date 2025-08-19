@@ -28,7 +28,7 @@ jobs:
       IMAGE_NAMES: docker.io/peeringmanager/peering-manager ghcr.io/peering-manager/peering-manager
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Get version of Peering Manager Docker
         run: echo "version=$(cat VERSION)" >>"$GITHUB_OUTPUT"
         shell: bash

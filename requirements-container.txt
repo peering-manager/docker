@@ -1,2 +1,2 @@
-django-auth-ldap
+django-auth-ldap<5.2
 django-radius

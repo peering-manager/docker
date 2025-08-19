@@ -33,7 +33,7 @@ jobs:
     name: Build new Peering Manager Docker images
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Docker Buildx
         id: buildx-setup
         uses: docker/setup-buildx-action@v3
