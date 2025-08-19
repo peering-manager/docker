@@ -395,7 +395,7 @@ if "NETBOX_API_THREADING" in environ:
     )
 if "NETBOX_API_VERIFY_SSL" in environ:
     NETBOX_API_VERIFY_SSL = _environ_get_and_map(
-        "NETBOX_API_THREADING", "True", _AS_BOOL
+        "NETBOX_API_VERIFY_SSL", "True", _AS_BOOL
     )
 if "NETBOX_DEVICE_ROLES" in environ:
     NETBOX_DEVICE_ROLES = _environ_get_and_map(
