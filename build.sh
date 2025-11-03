@@ -216,7 +216,7 @@ fi
 # Determining the value for DOCKER_FROM
 ###
 if [ -z "${DOCKER_FROM}" ]; then
-  DOCKER_FROM="docker.io/alpine:3.20"
+  DOCKER_FROM="docker.io/alpine:3.22"
 fi
 
 ###
