@@ -247,6 +247,10 @@ LOGIN_REQUIRED = _environ_get_and_map("LOGIN_REQUIRED", "True", _AS_BOOL)
 # before being prompted to re-authenticate. (Default: 1209600 [14 days])
 LOGIN_TIMEOUT = _environ_get_and_map("LOGIN_TIMEOUT", "1209600", _AS_INT)
 
+# When enabled, the login form will be hidden on the login page, keeping only SSO
+# authentication buttons available.
+LOGIN_FORM_HIDDEN = _environ_get_and_map("LOGIN_FORM_HIDDEN", "False", _AS_BOOL)
+
 # An API consumer can request an arbitrary number of objects =by appending the "limit"
 # parameter to the URL (e.g. "?limit=1000"). This setting defines the maximum limit.
 # Setting it to 0 or None will allow an API consumer to request all objects by
