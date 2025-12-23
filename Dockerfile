@@ -1,4 +1,4 @@
-ARG FROM
+ARG FROM=docker.io/alpine:3.23
 FROM ${FROM} AS builder
 
 RUN apk add --no-cache \
@@ -40,7 +40,7 @@ RUN mkdir app && \
 WORKDIR /bgp3
 
 RUN mkdir /bgpq3 && \
-    git clone https://github.com/snar/bgpq3 . && git checkout v0.1.36.1 && \
+    git clone https://github.com/snar/bgpq3 . && git checkout v0.1.38 && \
     ./configure && make install 
 
 WORKDIR /bgp4
