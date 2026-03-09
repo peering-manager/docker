@@ -39,7 +39,7 @@ jobs:
         run: ${{ matrix.build_cmd }}
       - name: Set up Docker Buildx
         id: buildx-setup
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
         if: steps.check-build-needed.outputs.skipped != 'true'
       # docker.io
       - name: Login to docker.io
