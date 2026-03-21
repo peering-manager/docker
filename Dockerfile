@@ -46,7 +46,7 @@ RUN mkdir /bgpq3 && \
 WORKDIR /bgp4
 
 RUN mkdir /bgpq4 && \
-    git clone https://github.com/bgp/bgpq4.git . && git checkout 1.12 && \
+    git clone https://github.com/bgp/bgpq4.git . && git checkout 1.16 && \
     ./bootstrap && ./configure && make install 
 
 ##############
