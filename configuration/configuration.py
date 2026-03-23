@@ -379,8 +379,8 @@ if "BGPQ3_SOURCES" in environ:
         "RPKI,RIPE,ARIN,APNIC,AFRINIC,LACNIC,RIPE-NONAUTH,RADB,ALTDB,NTTCOM,LEVEL3,TC",
     )
 BGPQ3_ARGS = {
-    "ipv6": _environ_get_and_map("BGPQ3_ARGS_IPV6", "-r 16 -R 48", _AS_LIST),
-    "ipv4": _environ_get_and_map("BGPQ3_ARGS_IPV4", "-r 8 -R 24", _AS_LIST),
+    "ipv6": _environ_get_and_map("BGPQ3_ARGS_IPV6", "-A -r 16 -R 48", _AS_LIST),
+    "ipv4": _environ_get_and_map("BGPQ3_ARGS_IPV4", "-A -r 8 -R 24", _AS_LIST),
 }
 if "BGPQ4_KEEP_SOURCE_IN_SET" in environ:
     BGPQ4_KEEP_SOURCE_IN_SET = _environ_get_and_map(
