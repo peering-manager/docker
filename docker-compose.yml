@@ -48,6 +48,7 @@ services:
   peeringdb-sync:
     <<: *peering-manager
     environment:
+      COMMAND_DELAY: 120
       COMMAND_INTERVAL: 86400
     depends_on:
       peering-manager:
