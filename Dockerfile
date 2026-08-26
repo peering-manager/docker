@@ -71,8 +71,7 @@ RUN apk add --no-cache \
     py3-pip \
     python3 \
     tini \
-    unit \
-    unit-python3 \
+    tzdata \
     util-linux
 
 COPY --from=builder /opt/peering-manager/venv /opt/peering-manager/venv
