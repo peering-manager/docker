@@ -1,4 +1,4 @@
-ARG FROM=docker.io/alpine:3.23
+ARG FROM=docker.io/alpine:3.24
 FROM ${FROM} AS builder
 
 RUN apk add --no-cache \
@@ -12,12 +12,12 @@ RUN apk add --no-cache \
     jpeg-dev \
     libevent-dev \
     libffi-dev \
+    libpq-dev \
     libxslt-dev \
     xmlsec-dev \
     make \
     musl-dev \
     openldap-dev \
-    postgresql-dev \
     py3-pip \
     python3-dev \
     && python3 -m venv /opt/peering-manager/venv \
@@ -63,15 +63,17 @@ RUN apk add --no-cache \
     libffi \
     libjpeg-turbo \
     libldap \
+    libpq \
     libsasl \
     libxslt \
     openssl \
-    postgresql-client \
-    postgresql-libs \
+    postgresql18-client \
     py3-pip \
     python3 \
     tini \
     tzdata \
+    freeunit \
+    freeunit-python3 \
     util-linux
 
 COPY --from=builder /opt/peering-manager/venv /opt/peering-manager/venv
