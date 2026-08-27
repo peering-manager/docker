@@ -1,7 +1,9 @@
 import json
 import re
+from collections.abc import Callable
 from os import environ
-from typing import Any, Callable
+from pathlib import Path
+from typing import Any
 
 # For reference see: https://docs.peering-manager.net/configuration/
 
@@ -9,12 +11,10 @@ from typing import Any, Callable
 # Read secret from file
 def _read_secret(secret_name: str, default: str | None = None) -> str | None:
     try:
-        f = open(f"/run/secrets/{secret_name}", encoding="utf-8")
-    except EnvironmentError:
-        return default
-    else:
-        with f:
+        with Path(f"/run/secrets/{secret_name}").open(encoding="utf-8") as f:
             return f.readline().strip()
+    except OSError:
+        return default
 
 
 # If the `map_fn` isn't defined, then the value that is read from the environment (or
@@ -28,7 +28,7 @@ def _read_secret(secret_name: str, default: str | None = None) -> str | None:
 def _environ_get_and_map(
     variable_name: str,
     default: str | None = None,
-    map_fn: Callable[[str], Any | None] = None,
+    map_fn: Callable[[str], Any | None] | None = None,
 ) -> Any | None:
     env_value = environ.get(variable_name, default)
 
@@ -158,6 +158,10 @@ SECRET_KEY = _read_secret("secret_key", environ.get("SECRET_KEY", ""))
 if "ADMINS" in environ:
     ADMINS = _environ_get_and_map("ADMINS", "[]", _AS_STRUCT)
 
+# Serve Peering Manager from a directory. For example, set BASE_PATH to "peering/"
+# to serve it at https://example.com/peering/. Empty means the root of the domain.
+BASE_PATH = environ.get("BASE_PATH", "")
+
 # Maximum number of days to retain logged changes. Set to 0 to retain changes
 # indefinitely. (Default: 90)
 if "CHANGELOG_RETENTION" in environ:
@@ -171,6 +175,23 @@ if "JOB_RETENTION" in environ:
 # Manager. For backwards compatibility, map JOBRESULT_RETENTION to JOB_RETENTION
 elif "JOBRESULT_RETENTION" in environ:
     JOB_RETENTION = _environ_get_and_map("JOBRESULT_RETENTION", None, _AS_INT)
+
+# Number of seconds to keep the details of a BGP session, an IX-API answer or a
+# prefix list in the cache. (Defaults: 900, 900 and 3600)
+if "CACHE_BGP_DETAIL_TIMEOUT" in environ:
+    CACHE_BGP_DETAIL_TIMEOUT = _environ_get_and_map(
+        "CACHE_BGP_DETAIL_TIMEOUT", None, _AS_INT
+    )
+if "CACHE_IXAPI_TIMEOUT" in environ:
+    CACHE_IXAPI_TIMEOUT = _environ_get_and_map("CACHE_IXAPI_TIMEOUT", None, _AS_INT)
+if "CACHE_PREFIX_LIST_TIMEOUT" in environ:
+    CACHE_PREFIX_LIST_TIMEOUT = _environ_get_and_map(
+        "CACHE_PREFIX_LIST_TIMEOUT", None, _AS_INT
+    )
+
+# Number of seconds to wait for an answer from an IX-API endpoint. (Default: 30)
+if "IXAPI_TIMEOUT" in environ:
+    IXAPI_TIMEOUT = _environ_get_and_map("IXAPI_TIMEOUT", None, _AS_INT)
 
 # API Cross-Origin Resource Sharing (CORS) settings. If CORS_ORIGIN_ALLOW_ALL is set
 # to True, all origins will be allowed. Otherwise, define a list of allowed origins
@@ -258,6 +279,13 @@ LOGIN_FORM_HIDDEN = _environ_get_and_map("LOGIN_FORM_HIDDEN", "False", _AS_BOOL)
 if "MAX_PAGE_SIZE" in environ:
     MAX_PAGE_SIZE = _environ_get_and_map("MAX_PAGE_SIZE", None, _AS_INT)
 
+# Default preferences applied to a user who did not set their own, as a JSON
+# object. For example: DEFAULT_USER_PREFERENCES={"pagination": {"per_page": 100}}
+if "DEFAULT_USER_PREFERENCES" in environ:
+    DEFAULT_USER_PREFERENCES = _environ_get_and_map(
+        "DEFAULT_USER_PREFERENCES", None, _AS_STRUCT
+    )
+
 # Expose Prometheus monitoring metrics at the HTTP endpoint '/metrics'
 METRICS_ENABLED = _environ_get_and_map("METRICS_ENABLED", "False", _AS_BOOL)
 
@@ -318,6 +346,9 @@ RQ_DEFAULT_TIMEOUT = _environ_get_and_map("RQ_DEFAULT_TIMEOUT", "300", _AS_INT)
 # The name to use for the csrf token cookie.
 CSRF_COOKIE_NAME = environ.get("CSRF_COOKIE_NAME", "csrftoken")
 
+# Send the csrf token cookie only over HTTPS. (Default: False)
+CSRF_COOKIE_SECURE = _environ_get_and_map("CSRF_COOKIE_SECURE", "False", _AS_BOOL)
+
 # Cross-Site-Request-Forgery-Attack settings. If Peering Manager is sitting behind a
 # reverse proxy, you might need to set the CSRF_TRUSTED_ORIGINS flag. Django 4.0
 # requires to specify the URL Scheme in this setting. An example environment variable
@@ -328,6 +359,21 @@ CSRF_TRUSTED_ORIGINS = _environ_get_and_map("CSRF_TRUSTED_ORIGINS", "", _AS_LIST
 # The name to use for the session cookie.
 SESSION_COOKIE_NAME = environ.get("SESSION_COOKIE_NAME", "sessionid")
 
+# Send the session cookie only over HTTPS. (Default: False)
+SESSION_COOKIE_SECURE = _environ_get_and_map("SESSION_COOKIE_SECURE", "False", _AS_BOOL)
+
+# Header and value that tell Peering Manager a reverse proxy handled the request
+# over HTTPS, as two space separated words. Empty ignores such a header.
+# (Default: "HTTP_X_FORWARDED_PROTO https")
+if "SECURE_PROXY_SSL_HEADER" in environ:
+    SECURE_PROXY_SSL_HEADER = (
+        tuple(_environ_get_and_map("SECURE_PROXY_SSL_HEADER", None, _AS_LIST)) or None
+    )
+
+# Use the X-Forwarded-Host header to build absolute URLs. (Default: True)
+if "USE_X_FORWARDED_HOST" in environ:
+    USE_X_FORWARDED_HOST = _environ_get_and_map("USE_X_FORWARDED_HOST", None, _AS_BOOL)
+
 # By default, Peering Manager will store session data in the database. Alternatively,
 # a file path can be specified here to use local file storage instead. (This can be
 # useful for enabling authentication on a standby instance with read-only database
@@ -337,6 +383,22 @@ SESSION_FILE_PATH = environ.get("SESSION_FILE_PATH", environ.get("SESSIONS_ROOT"
 
 # Time zone (default: UTC)
 TIME_ZONE = environ.get("TIME_ZONE", "UTC")
+
+# Formats used to display a date and a time. See the Django documentation for the
+# accepted format specifiers:
+#   https://docs.djangoproject.com/en/stable/ref/templates/builtins/#date
+if "DATE_FORMAT" in environ:
+    DATE_FORMAT = environ.get("DATE_FORMAT", "jS F, Y")
+if "DATETIME_FORMAT" in environ:
+    DATETIME_FORMAT = environ.get("DATETIME_FORMAT", "jS F, Y G:i")
+if "SHORT_DATE_FORMAT" in environ:
+    SHORT_DATE_FORMAT = environ.get("SHORT_DATE_FORMAT", "Y-m-d")
+if "SHORT_DATETIME_FORMAT" in environ:
+    SHORT_DATETIME_FORMAT = environ.get("SHORT_DATETIME_FORMAT", "Y-m-d H:i")
+if "SHORT_TIME_FORMAT" in environ:
+    SHORT_TIME_FORMAT = environ.get("SHORT_TIME_FORMAT", "H:i:s")
+if "TIME_FORMAT" in environ:
+    TIME_FORMAT = environ.get("TIME_FORMAT", "G:i")
 
 # Text to include on the login page above the login form. HTML is allowed.
 if "BANNER_LOGIN" in environ:
@@ -360,13 +422,11 @@ if "NAPALM_PASSWORD" in environ:
     )
 if "NAPALM_TIMEOUT" in environ:
     NAPALM_TIMEOUT = _environ_get_and_map("NAPALM_TIMEOUT", "10", _AS_INT)
-NAPALM_ARGS = dict(
-    [
-        (var[len("NAPALM_ARG_") :].lower(), environ.get(var))
-        for var in environ.keys()
-        if var.startswith("NAPALM_ARG_")
-    ]
-)
+NAPALM_ARGS = {
+    var[len("NAPALM_ARG_") :].lower(): environ.get(var)
+    for var in environ
+    if var.startswith("NAPALM_ARG_")
+}
 
 # The path to the bgpq3 or bgpq4 binary
 if "BGPQ3_PATH" in environ:
@@ -442,6 +502,20 @@ if "GIT_COMMIT_MESSAGE" in environ:
 if "VALIDATE_BGP_COMMUNITY_VALUE" in environ:
     VALIDATE_BGP_COMMUNITY_VALUE = _environ_get_and_map(
         "VALIDATE_BGP_COMMUNITY_VALUE", "True", _AS_BOOL
+    )
+
+# Status given to the sessions that Peering Manager creates when an operator
+# accepts a peering request. (Default: "requested")
+if "PEERING_REQUEST_SESSION_STATUS" in environ:
+    PEERING_REQUEST_SESSION_STATUS = environ.get(
+        "PEERING_REQUEST_SESSION_STATUS", "requested"
+    )
+
+# Block the creation of a session that is already part of a pending peering
+# request. (Default: False)
+if "PEERING_REQUEST_BLOCKS_SESSION_CREATION" in environ:
+    PEERING_REQUEST_BLOCKS_SESSION_CREATION = _environ_get_and_map(
+        "PEERING_REQUEST_BLOCKS_SESSION_CREATION", "False", _AS_BOOL
     )
 
 # When merging configuration contexts, Peering Manager needs to know what
