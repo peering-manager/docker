@@ -34,6 +34,36 @@ To run the Peering Manager application stack with Docker Compose, copy the
 `docker-compose.override.yml.example` file into `docker-compose.override.yml`
 and override definitions from this file.
 
+### Scheduled Tasks
+
+Peering Manager 1.11 and later run housekeeping and PeeringDB synchronisation
+from the `rqworker` service. Manage the schedule of each task from
+**Admin > Scheduled Tasks** in the web interface.
+
+The `housekeeping` and `peeringdb-sync` services stay in `docker-compose.yml`
+for users who prefer an external scheduler. They do not start by default.
+First disable the matching tasks in **Admin > Scheduled Tasks**, then start
+them:
+
+```shell
+docker compose --profile external-scheduler up --detach
+```
+
+Do not run a task twice. Two runs of the same task waste resources, and a
+PeeringDB synchronisation can take about 90 minutes.
+
+### Base Path
+
+Set `BASE_PATH` in `env/peering-manager.env` to serve Peering Manager from a
+directory, for example `https://example.com/peering/`:
+
+```shell
+BASE_PATH=peering/
+```
+
+The container applies the value to the URLs, to the static files and to its
+health check.
+
 ## About
 
 This work is based on the great

@@ -10,7 +10,7 @@ services:
     env_file: env/peering-manager.env
     user: "unit:root"
     healthcheck:
-      test: curl -f http://localhost:8080/login/ || exit 1
+      test: /opt/peering-manager/healthcheck.sh
       start_period: 90s
       timeout: 3s
       interval: 15s
@@ -30,8 +30,13 @@ services:
       start_period: 20s
       timeout: 3s
       interval: 15s
+  # As of 1.11 the rqworker runs these two tasks itself, on a schedule managed
+  # in Admin > Scheduled Tasks. The services below serve an external scheduler
+  # instead: disable the tasks there, then start this profile.
   housekeeping:
     <<: *peering-manager
+    profiles:
+      - external-scheduler
     environment:
       COMMAND_INTERVAL: 86400
     depends_on:
@@ -47,6 +52,8 @@ services:
       interval: 15s
   peeringdb-sync:
     <<: *peering-manager
+    profiles:
+      - external-scheduler
     environment:
       COMMAND_INTERVAL: 86400
     depends_on:
