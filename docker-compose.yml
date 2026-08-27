@@ -11,7 +11,7 @@ services:
     user: "unit:root"
     healthcheck:
       test: /opt/peering-manager/healthcheck.sh
-      start_period: 90s
+      start_period: 240s # Allow migrations to run, some can be expensive
       timeout: 3s
       interval: 15s
     volumes:
