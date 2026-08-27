@@ -89,6 +89,7 @@ COPY docker/configuration.docker.py /opt/peering-manager/peering_manager/configu
 COPY docker/ldap_config.docker.py /opt/peering-manager/peering_manager/ldap_config.py
 COPY docker/docker-entrypoint.sh /opt/peering-manager/docker-entrypoint.sh
 COPY docker/run-command.sh /opt/peering-manager/run-command.sh
+COPY docker/healthcheck.sh /opt/peering-manager/healthcheck.sh
 COPY docker/launch-peering-manager.sh /opt/peering-manager/launch-peering-manager.sh
 COPY configuration/ /etc/peering-manager/config/
 COPY docker/nginx-unit.json /etc/unit/
@@ -98,7 +99,7 @@ WORKDIR /opt/peering-manager
 # Must set permissions for '/opt/peering-manager/static' directory
 # to g+w so that `./manage.py collectstatic` can be executed during
 # container startup.
-RUN mkdir -p static /opt/unit/state/ /opt/unit/tmp/ \
+RUN mkdir -p static /opt/unit/state/ /opt/unit/tmp/ /opt/unit/static-root/ \
     && chown -R unit:root /opt/unit/ \
     && chmod -R g+w /opt/unit/ \
     && cd /opt/peering-manager/ \

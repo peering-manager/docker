@@ -17,10 +17,10 @@
         "main": [
             {
                 "match": {
-                    "uri": "/static/*"
+                    "uri": "/__BASE_PATH__static/*"
                 },
                 "action": {
-                    "share": "/opt/peering-manager${uri}"
+                    "share": "/opt/unit/static-root${uri}"
                 }
             },
             {
