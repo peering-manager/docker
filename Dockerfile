@@ -1,4 +1,4 @@
-ARG FROM=docker.io/alpine:3.23
+ARG FROM=docker.io/alpine:3.24
 FROM ${FROM} AS builder
 
 RUN apk add --no-cache \
@@ -12,12 +12,12 @@ RUN apk add --no-cache \
     jpeg-dev \
     libevent-dev \
     libffi-dev \
+    libpq-dev \
     libxslt-dev \
     xmlsec-dev \
     make \
     musl-dev \
     openldap-dev \
-    postgresql-dev \
     py3-pip \
     python3-dev \
     && python3 -m venv /opt/peering-manager/venv \
@@ -63,16 +63,17 @@ RUN apk add --no-cache \
     libffi \
     libjpeg-turbo \
     libldap \
+    libpq \
     libsasl \
     libxslt \
     openssl \
-    postgresql-client \
-    postgresql-libs \
+    postgresql18-client \
     py3-pip \
     python3 \
     tini \
-    unit \
-    unit-python3 \
+    tzdata \
+    freeunit \
+    freeunit-python3 \
     util-linux
 
 COPY --from=builder /opt/peering-manager/venv /opt/peering-manager/venv
@@ -88,6 +89,7 @@ COPY docker/configuration.docker.py /opt/peering-manager/peering_manager/configu
 COPY docker/ldap_config.docker.py /opt/peering-manager/peering_manager/ldap_config.py
 COPY docker/docker-entrypoint.sh /opt/peering-manager/docker-entrypoint.sh
 COPY docker/run-command.sh /opt/peering-manager/run-command.sh
+COPY docker/healthcheck.sh /opt/peering-manager/healthcheck.sh
 COPY docker/launch-peering-manager.sh /opt/peering-manager/launch-peering-manager.sh
 COPY configuration/ /etc/peering-manager/config/
 COPY docker/nginx-unit.json /etc/unit/
@@ -97,7 +99,7 @@ WORKDIR /opt/peering-manager
 # Must set permissions for '/opt/peering-manager/static' directory
 # to g+w so that `./manage.py collectstatic` can be executed during
 # container startup.
-RUN mkdir -p static /opt/unit/state/ /opt/unit/tmp/ \
+RUN mkdir -p static /opt/unit/state/ /opt/unit/tmp/ /opt/unit/static-root/ \
     && chown -R unit:root /opt/unit/ \
     && chmod -R g+w /opt/unit/ \
     && cd /opt/peering-manager/ \
