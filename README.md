@@ -64,6 +64,48 @@ BASE_PATH=peering/
 The container applies the value to the URLs, to the static files and to its
 health check.
 
+## Upgrade PostgreSQL
+
+`docker-compose.yml` tracks a recent PostgreSQL release, so a `git pull` can
+move the database to a new major version. A server refuses a data directory
+that another major version wrote, so every major bump needs a dump and a
+restore.
+
+Take the dump before you pull, while the old server still runs:
+
+```shell
+docker compose exec -T postgres pg_dumpall -U peering_manager >dump.sql
+docker compose down
+docker volume ls  # find the name of the postgres volume
+docker volume rm <project>_peeringmanager-postgres-data
+git pull
+docker compose up --detach --wait postgres
+docker compose exec -T postgres psql -U peering_manager -d postgres <dump.sql
+docker compose up --detach
+```
+
+Compose puts the name of your project in front of the volume, hence the
+`docker volume ls` step.
+
+The restore reports two errors, one for the role and one for the database that
+already exist. Ignore them, because the new container creates both before the
+restore runs.
+
+To stay on your current major version, pin the image in your
+`docker-compose.override.yml`. For example, to keep PostgreSQL 17:
+
+```yaml
+services:
+  postgres:
+    image: docker.io/postgres:17-alpine
+```
+
+One extra step applies when you come from PostgreSQL 17 or older. Version 18
+keeps its data in a directory named after the major version, so
+`docker-compose.yml` mounts the volume on `/var/lib/postgresql` instead of
+`/var/lib/postgresql/data`. Copy that change if you declare the postgres
+service yourself.
+
 ## About
 
 This work is based on the great
