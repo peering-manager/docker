@@ -7,3 +7,16 @@ updates:
       interval: "weekly"
     assignees:
       - "gmazoyer"
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "gmazoyer"
+  - package-ecosystem: "docker-compose"
+    directories:
+      - "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "gmazoyer"
