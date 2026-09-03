@@ -18,19 +18,16 @@ RUN apk add --no-cache \
     make \
     musl-dev \
     openldap-dev \
-    py3-pip \
     python3-dev \
-    && python3 -m venv /opt/peering-manager/venv \
-    && /opt/peering-manager/venv/bin/python3 -m pip install --upgrade \
-    pip \
-    setuptools \
-    wheel
+    uv \
+    && uv venv --seed --python python3 /opt/peering-manager/venv
 
 ARG PEERING_MANAGER_PATH
 COPY ${PEERING_MANAGER_PATH}/requirements.txt requirements-container.txt /
+ENV UV_NO_CACHE=1 UV_PYTHON=/opt/peering-manager/venv/bin/python3
 RUN \
     sed -i -e 's/social-auth-core/social-auth-core\[all\]/g' /requirements.txt && \
-    /opt/peering-manager/venv/bin/pip install -r /requirements.txt -r /requirements-container.txt
+    uv pip install -r /requirements.txt -r /requirements-container.txt
 
 FROM ${FROM} AS bgpq-builder
 
