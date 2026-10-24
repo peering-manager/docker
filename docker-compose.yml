@@ -26,7 +26,7 @@ services:
       - /opt/peering-manager/manage.py
       - rqworker
     healthcheck:
-      test: pgrep -f rqworker || exit 1
+      test: ["CMD", "pgrep", "-f", "rqworker"]
       start_period: 20s
       timeout: 3s
       interval: 15s
@@ -46,7 +46,7 @@ services:
       - /opt/peering-manager/run-command.sh
       - housekeeping
     healthcheck:
-      test: pgrep -f housekeeping || exit 1
+      test: ["CMD", "pgrep", "-f", "housekeeping"]
       start_period: 20s
       timeout: 3s
       interval: 15s
@@ -63,7 +63,7 @@ services:
       - /opt/peering-manager/run-command.sh
       - peeringdb_sync
     healthcheck:
-      test: pgrep -f peeringdb_sync || exit 1
+      test: ["CMD", "pgrep", "-f", "peeringdb_sync"]
       start_period: 20s
       timeout: 3s
       interval: 15s
