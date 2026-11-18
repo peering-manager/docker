@@ -57,6 +57,12 @@ def _AS_STRUCT(value: str) -> dict[Any, Any] | list[Any]:
     return json.loads(value)
 
 
+def _AS_CONTACTS(value: str) -> list[str | tuple[str, ...]]:
+    # JSON has no tuples, but Peering Manager expects each contact to be either
+    # an address string or an (address, name) tuple, so convert inner lists.
+    return [tuple(c) if isinstance(c, list) else c for c in json.loads(value)]
+
+
 # This is a list of valid fully-qualified domain names (FQDNs) for this server.
 # The server will not permit write access to the server via any other
 # hostnames. The first FQDN in the list will be treated as the preferred name.
@@ -225,7 +231,7 @@ EMAIL = {
     "USE_TLS": _environ_get_and_map("EMAIL_USE_TLS", "False", _AS_BOOL),
     "SSL_KEYFILE": environ.get("EMAIL_SSL_KEYFILE", ""),
     "SSL_CERTFILE": environ.get("EMAIL_SSL_CERTFILE", ""),
-    "CC_CONTACTS": _environ_get_and_map("EMAIL_CC_CONTACTS", "[]", _AS_STRUCT),
+    "CC_CONTACTS": _environ_get_and_map("EMAIL_CC_CONTACTS", "[]", _AS_CONTACTS),
 }
 
 # By default, Peering Manager sends census reporting data using a single HTTP request
